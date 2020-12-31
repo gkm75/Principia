@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Authors>Gordon Mangion</Authors>
+    <Company />
+    <Description>Initial Version of Principia.Monads at the moment containing only the definition of the ResultType (aka Either Monad)</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/gkm75/Principia</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gkm75/Principia</RepositoryUrl>
+    <PackageTags>Monad, Result, ResultType, Either, Option, OptionType, Optional. Maybe</PackageTags>
+    <PackageReleaseNotes>Initial Version</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+</Project>
