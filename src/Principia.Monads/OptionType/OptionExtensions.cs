@@ -1,4 +1,6 @@
-﻿namespace Principia.Monads
+﻿using System;
+
+namespace Principia.Monads
 {
     public static class OptionExtensions
     {
@@ -14,7 +16,32 @@
         public static T ValueOrDefault<T>(this Option<T> option)
             => option.IsSome ? option.Value : default;
 
-        public static Option<T> Join<T>(Option<Option<T>> option)
+        public static Option<T> Join<T>(this Option<Option<T>> option)
             => option.IsSome ? option.Value : Option.None<T>();
+
+        public static Option<T> Bind<T>(this Option<T> option, Func<T, Option<T>> bindFn)
+            => option.IsSome ? bindFn(option.Value) : Option.None<T>();
+
+        public static Option<U> Map<T, U>(this Option<T> option, Func<T, U> mapFn)
+            => option.IsSome ? Option.From(mapFn(option.Value)) : Option.None<U>();
+
+        public static Option<U> Applicative<T, U>(this Option<T> option, Option<Func<T, U>> optionMapFn)
+            => option.IsSome && optionMapFn.IsSome ? Option.From(optionMapFn.Value(option.Value)) : Option.None<U>();
+
+
+        //Bimap/BiFunctor
+        //Combine
+        //When
+        //On
+        //Handle/Visit/Match
+        //MapNone
+
+        //Try-Catch
+
+        //Chain
+
+        //Pipeline
+        //Compose
+
     }
 }

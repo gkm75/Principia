@@ -1,15 +1,16 @@
-﻿namespace Principia.Monads
+﻿using System;
+
+namespace Principia.Monads
 {
     public static class MonadExtensions
     {
-        public static Monad<T> Join<T>(Monad<Monad<T>> monad)
+        public static Monad<T> Join<T>(this Monad<Monad<T>> monad)
             => monad.Value;
 
-        //Map: IMonad<B> Fmap<B>(Func<A, B> function); 
-        //App IMonad<B> App<B>(IMonad<Func<A, B>> functionMonad); 
-        //Combine
-        //When
-        //On
-        //Handle/Visit
+        public static Monad<U> Map<T, U>(this Monad<T> monad, Func<T, U> mapFn)
+            => monad.Pure(mapFn(monad.Value));
+
+        public static Monad<U> Applicative<T, U>(this Monad<T> monad, Monad<Func<T, U>> monadMapFn)
+            => monad.Pure(monadMapFn.Value(monad.Value));
     }
 }

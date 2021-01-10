@@ -49,7 +49,10 @@ namespace Principia.Monads
                : false;
 
         public Monad<TOk> Unit()
-            => Result.Ok<TOk, TFail>(Value);
+            => this;
+
+        public Monad<U> Pure<U>(U value)
+            => Result.Ok<U, TFail>(value);
 
         public Monad<U> Bind<U>(Func<TOk, Monad<U>> bindFn)
         => IsOk
@@ -98,6 +101,9 @@ namespace Principia.Monads
 
         public Monad<TOk> Unit()
             => Result.Fail<TOk, TFail>(FailValue);
+
+        public Monad<U> Pure<U>(U value)
+            => Result.Ok<U, TFail>(value);
 
         public Monad<U> Bind<U>(Func<TOk, Monad<U>> bindFn)
             => Result.Fail<U, TFail>(FailValue);

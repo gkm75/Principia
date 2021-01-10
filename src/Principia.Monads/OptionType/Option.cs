@@ -27,8 +27,11 @@ namespace Principia.Monads
             }
         }
 
-        public Monad<T> Unit() 
-            => Option.From(Value);
+        public Monad<T> Unit()
+            => this;
+
+        public Monad<U> Pure<U>(U value) 
+            => Option.From(value);
 
         public Monad<U> Bind<U>(Func<T, Monad<U>> bindFn)
             => IsSome
