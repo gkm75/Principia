@@ -4,6 +4,8 @@ namespace Principia.Monads
 {
     public struct Option<T> : Monad<T>, IEquatable<Option<T>>
     {
+        internal static Option<T> None => new Option<T>(false, default);
+
         public bool IsSome { get; }
         public bool IsNone => !IsSome;
 
