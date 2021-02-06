@@ -91,14 +91,6 @@ namespace Principia.Monads
                         : Task.FromResult(Result.Fail<UOk, TFail>(task.Result.FailValue)), TaskContinuationOptions.OnlyOnRanToCompletion)
                 .ContinueWith(task => task.Result.Result, TaskContinuationOptions.OnlyOnRanToCompletion);
 
-        //-------------------------------------------------------------------------------------------------------------------------------------------
-
-        /*
-        public static Result<UOk, TFail> WhenOk
-        public static Result<UOk, TFail> WhenFail
-        */
-        //-------------------------------------------------------------------------------------------------------------------------------------------
-
         public static async Task<Result<TOk, TFail>> WhenOkAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Action okAction)
         {
             var result = await resultTask;
@@ -176,12 +168,71 @@ namespace Principia.Monads
         }
 
 
-        /*
+        public static Task<Result<TOk, TFail>> OnOkAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>> okFn)
+            => resultTask.ContinueWith(task => task.Result.IsOk && okFn != null ? okFn() : task.Result);
 
-        public static Result<UOk, TFail> OnOk
-        public static Result<UOk, TFail> OnFail
+        public static Task<Result<TOk, TFail>> OnOkAsync<TOk, TFail>(this Result<TOk, TFail> result, Func<Task<Result<TOk, TFail>>> okFnAsync)
+            => (result.IsOk && okFnAsync != null) ? okFnAsync() : Task.FromResult(result);
 
-         */
+        public static Task<Result<TOk, TFail>> OnOkAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Task<Result<TOk, TFail>>> okFnAsync)
+            => resultTask
+                .ContinueWith(task => task.Result.IsOk && okFnAsync != null ? okFnAsync() : task)
+                .ContinueWith(task => task.Result.Result);
+
+        public static Task<Result<TOk, TFail>> OnOkAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<TOk, Result<TOk, TFail>> okFn)
+            => resultTask.ContinueWith(task => task.Result.IsOk && okFn != null ? okFn(task.Result.Value) : task.Result);
+
+        public static Task<Result<TOk, TFail>> OnOkAsync<TOk, TFail>(this Result<TOk, TFail> result, Func<TOk, Task<Result<TOk, TFail>>> okFnAsync)
+            => (result.IsOk && okFnAsync != null) ? okFnAsync(result.Value) : Task.FromResult(result);
+
+        public static Task<Result<TOk, TFail>> OnOkAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<TOk, Task<Result<TOk, TFail>>> okFnAsync)
+            => resultTask
+                .ContinueWith(task => task.Result.IsOk && okFnAsync != null ? okFnAsync(task.Result.Value) : task)
+                .ContinueWith(task => task.Result.Result);
+
+        public static Task<Result<TOk, TFail>> OnOkAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>, Result<TOk, TFail>> okFn)
+            => resultTask.ContinueWith(task => task.Result.IsOk && okFn != null ? okFn(task.Result) : task.Result);
+
+        public static Task<Result<TOk, TFail>> OnOkAsync<TOk, TFail>(this Result<TOk, TFail> result, Func<Result<TOk, TFail>, Task<Result<TOk, TFail>>> okFnAsync)
+            => (result.IsOk && okFnAsync != null) ? okFnAsync(result) : Task.FromResult(result);
+
+        public static Task<Result<TOk, TFail>> OnOkAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>, Task<Result<TOk, TFail>>> okFnAsync)
+            => resultTask
+                .ContinueWith(task => task.Result.IsOk && okFnAsync != null ? okFnAsync(task.Result) : task)
+                .ContinueWith(task => task.Result.Result);
+
+        public static Task<Result<TOk, TFail>> OnFailAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>> failFn)
+            => resultTask.ContinueWith(task => task.Result.IsFail && failFn != null ? failFn() : task.Result);
+
+        public static Task<Result<TOk, TFail>> OnFailAsync<TOk, TFail>(this Result<TOk, TFail> result, Func<Task<Result<TOk, TFail>>> failFnAsync)
+            => (result.IsFail && failFnAsync != null) ? failFnAsync() : Task.FromResult(result);
+
+        public static Task<Result<TOk, TFail>> OnFailAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Task<Result<TOk, TFail>>> failFnAsync)
+            => resultTask
+                .ContinueWith(task => task.Result.IsFail && failFnAsync != null ? failFnAsync() : task)
+                .ContinueWith(task => task.Result.Result);
+
+        public static Task<Result<TOk, TFail>> OnFailAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<TOk, Result<TOk, TFail>> failFn)
+            => resultTask.ContinueWith(task => task.Result.IsFail && failFn != null ? failFn(task.Result.Value) : task.Result);
+
+        public static Task<Result<TOk, TFail>> OnFailAsync<TOk, TFail>(this Result<TOk, TFail> result, Func<TOk, Task<Result<TOk, TFail>>> failFnAsync)
+            => (result.IsFail && failFnAsync != null) ? failFnAsync(result.Value) : Task.FromResult(result);
+
+        public static Task<Result<TOk, TFail>> OnFailAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<TOk, Task<Result<TOk, TFail>>> failFnAsync)
+            => resultTask
+                .ContinueWith(task => task.Result.IsFail && failFnAsync != null ? failFnAsync(task.Result.Value) : task)
+                .ContinueWith(task => task.Result.Result);
+
+        public static Task<Result<TOk, TFail>> OnFailAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>, Result<TOk, TFail>> failFn)
+            => resultTask.ContinueWith(task => task.Result.IsFail && failFn != null ? failFn(task.Result) : task.Result);
+
+        public static Task<Result<TOk, TFail>> OnFailAsync<TOk, TFail>(this Result<TOk, TFail> result, Func<Result<TOk, TFail>, Task<Result<TOk, TFail>>> failFnAsync)
+            => (result.IsFail && failFnAsync != null) ? failFnAsync(result) : Task.FromResult(result);
+
+        public static Task<Result<TOk, TFail>> OnFailAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>, Task<Result<TOk, TFail>>> failFnAsync)
+            => resultTask
+                .ContinueWith(task => task.Result.IsFail && failFnAsync != null ? failFnAsync(task.Result) : task)
+                .ContinueWith(task => task.Result.Result);
 
         public static async Task<Result<UOk, TFail>> BimapAsync<TOk, UOk, TFail>(this Result<TOk, TFail> result, Func<TOk, Task<UOk>> okFnAsync, Func<Task<UOk>> failFnAsync)
             => (result.IsOk && okFnAsync != null) ? Result.Ok<UOk, TFail>(await okFnAsync(result.Value)) : Result.Ok<UOk, TFail>(await failFnAsync());
