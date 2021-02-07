@@ -4,6 +4,10 @@ namespace Principia.Monads
 {
     public static class Result
     {
+        public static Monad<TOk> Pure<TOk>(TOk value) => Ok<TOk, TOk>(value);
+
+        public static Monad<TOk> Pure<TOk, TFail>(TOk value) => Ok<TOk, TFail>(value);
+
         public static Result<TOk, TFail> Ok<TOk, TFail>(TOk ok)
             => new ResultOk<TOk, TFail>(ok);
 

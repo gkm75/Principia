@@ -41,7 +41,7 @@ namespace Principia.Monads
                 : Option.None<U>();
 
         public bool Equals(Option<T> other)
-            => IsSome == other.IsSome && _some.Equals(other._some) || IsNone == other.IsNone;
+            => IsNone == other.IsNone || (IsSome == other.IsSome && _some.Equals(other._some));
 
         public override bool Equals(object obj)
             => obj is Option<T> other ? Equals(other) : false;

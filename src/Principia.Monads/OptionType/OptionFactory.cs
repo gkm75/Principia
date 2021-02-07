@@ -4,6 +4,8 @@ namespace Principia.Monads
 {
     public static class Option
     {
+        public static Monad<T> Pure<T>(T value) => Some(value);
+
         public static Option<T> Some<T>(T value) => new Option<T>(true, value);
 
         public static Option<T> None<T>() => Option<T>.None;
