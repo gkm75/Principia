@@ -1,7 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Gordon Mangion</Authors>
+    <Company />
+    <Description>Create Action and Func proxy stubs through Principia.Mocking mainly for testing if there were any invocations</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/gkm75/Principia</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gkm75/Principia</RepositoryUrl>
+    <PackageTags>Func, Action, Mocking, Testing, Higher Order Functions</PackageTags>
+    <PackageReleaseNotes>Initial Version</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
 </Project>

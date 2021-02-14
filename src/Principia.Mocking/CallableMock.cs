@@ -39,7 +39,7 @@ namespace Principia.Mocking
         {
             var result = times(_count);
             if (result.IsError)
-                throw new Exception(result.Message);
+                throw new VerifyInvokeException(result.Message);
         }
 
         protected void Exec()

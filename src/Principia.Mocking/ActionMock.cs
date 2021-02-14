@@ -4,37 +4,138 @@ namespace Principia.Mocking
 {
     public static class ActionMock
     {
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock Create() => new ActionInnerMock();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock Create(Action chainAction) => new ActionInnerMock(chainAction);
 
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1> Create<T1>() => new ActionInnerMock<T1>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1> Create<T1>(Action<T1> chainAction) => new ActionInnerMock<T1>(chainAction);
 
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2> Create<T1, T2>() => new ActionInnerMock<T1, T2>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2> Create<T1, T2>(Action<T1, T2> chainAction) => new ActionInnerMock<T1, T2>(chainAction);
 
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3> Create<T1, T2, T3>() => new ActionInnerMock<T1, T2, T3>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3> Create<T1, T2, T3>(Action<T1, T2, T3> chainAction) => new ActionInnerMock<T1, T2, T3>(chainAction);
 
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4> Create<T1, T2, T3, T4>() => new ActionInnerMock<T1, T2, T3, T4>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4> Create<T1, T2, T3, T4>(Action<T1, T2, T3, T4> chainAction) => new ActionInnerMock<T1, T2, T3, T4>(chainAction);
 
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4, T5> Create<T1, T2, T3, T4, T5>() => new ActionInnerMock<T1, T2, T3, T4, T5>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4, T5> Create<T1, T2, T3, T4, T5>(Action<T1, T2, T3, T4, T5> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5>(chainAction);
 
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4, T5, T6> Create<T1, T2, T3, T4, T5, T6>() => new ActionInnerMock<T1, T2, T3, T4, T5, T6>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4, T5, T6> Create<T1, T2, T3, T4, T5, T6>(Action<T1, T2, T3, T4, T5, T6> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5, T6>(chainAction);
 
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7> Create<T1, T2, T3, T4, T5, T6, T7>() => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7> Create<T1, T2, T3, T4, T5, T6, T7>(Action<T1, T2, T3, T4, T5, T6, T7> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7>(chainAction);
 
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8> Create<T1, T2, T3, T4, T5, T6, T7, T8>() => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8> Create<T1, T2, T3, T4, T5, T6, T7, T8>(Action<T1, T2, T3, T4, T5, T6, T7, T8> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8>(chainAction);
 
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9>() => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9>(chainAction);
     }
 
+    #region ActionMock Inner Stubs
 
     public class ActionInnerMock : CallableMock
     {
@@ -215,4 +316,6 @@ namespace Principia.Mocking
             };
         }
     }
+
+    #endregion
 }
