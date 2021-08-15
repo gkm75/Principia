@@ -133,6 +133,101 @@ namespace Principia.Mocking
         /// </summary>
         /// <returns>ActionInnerMock</returns>
         public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9>(chainAction);
+
+        //-------------------------------------------------------------------------------------
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>() => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(chainAction);
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>() => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(chainAction);
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>() => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(chainAction);
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>() => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(chainAction);
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>() => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(chainAction);
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>() => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(chainAction);
+
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>() => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>();
+
+        /// <summary>
+        /// Creates an Action proxy which is verifyable after it is invoked. This override also
+        /// accepts a callable action which is called in turn by the proxy itself
+        /// </summary>
+        /// <returns>ActionInnerMock</returns>
+        public static ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> Create<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> chainAction) => new ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(chainAction);
+
+
     }
 
     #region ActionMock Inner Stubs
@@ -148,9 +243,10 @@ namespace Principia.Mocking
 
         internal ActionInnerMock(Action chainAction)
         {
-            Object = () => { 
-                Exec(); 
-                chainAction?.Invoke(); 
+            Object = () =>
+            {
+                Exec();
+                chainAction?.Invoke();
             };
         }
     }
@@ -166,7 +262,8 @@ namespace Principia.Mocking
 
         internal ActionInnerMock(Action<T1> chainAction)
         {
-            Object = (T1 p1) => {
+            Object = (T1 p1) =>
+            {
                 Exec();
                 chainAction?.Invoke(p1);
             };
@@ -184,7 +281,8 @@ namespace Principia.Mocking
 
         internal ActionInnerMock(Action<T1, T2> chainAction)
         {
-            Object = (T1 p1, T2 p2) => {
+            Object = (T1 p1, T2 p2) =>
+            {
                 Exec();
                 chainAction?.Invoke(p1, p2);
             };
@@ -202,7 +300,8 @@ namespace Principia.Mocking
 
         internal ActionInnerMock(Action<T1, T2, T3> chainAction)
         {
-            Object = (T1 p1, T2 p2, T3 p3) => {
+            Object = (T1 p1, T2 p2, T3 p3) =>
+            {
                 Exec();
                 chainAction?.Invoke(p1, p2, p3);
             };
@@ -220,7 +319,8 @@ namespace Principia.Mocking
 
         internal ActionInnerMock(Action<T1, T2, T3, T4> chainAction)
         {
-            Object = (T1 p1, T2 p2, T3 p3, T4 p4) => {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4) =>
+            {
                 Exec();
                 chainAction?.Invoke(p1, p2, p3, p4);
             };
@@ -238,7 +338,8 @@ namespace Principia.Mocking
 
         internal ActionInnerMock(Action<T1, T2, T3, T4, T5> chainAction)
         {
-            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5) => {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5) =>
+            {
                 Exec();
                 chainAction?.Invoke(p1, p2, p3, p4, p5);
             };
@@ -256,7 +357,8 @@ namespace Principia.Mocking
 
         internal ActionInnerMock(Action<T1, T2, T3, T4, T5, T6> chainAction)
         {
-            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6) => {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6) =>
+            {
                 Exec();
                 chainAction?.Invoke(p1, p2, p3, p4, p5, p6);
             };
@@ -274,7 +376,8 @@ namespace Principia.Mocking
 
         internal ActionInnerMock(Action<T1, T2, T3, T4, T5, T6, T7> chainAction)
         {
-            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7) => {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7) =>
+            {
                 Exec();
                 chainAction?.Invoke(p1, p2, p3, p4, p5, p6, p7);
             };
@@ -292,7 +395,8 @@ namespace Principia.Mocking
 
         internal ActionInnerMock(Action<T1, T2, T3, T4, T5, T6, T7, T8> chainAction)
         {
-            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8) => {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8) =>
+            {
                 Exec();
                 chainAction?.Invoke(p1, p2, p3, p4, p5, p6, p7, p8);
             };
@@ -310,9 +414,164 @@ namespace Principia.Mocking
 
         internal ActionInnerMock(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> chainAction)
         {
-            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9) => {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9) =>
+            {
                 Exec();
                 chainAction?.Invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            };
+        }
+    }
+
+    public class ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : CallableMock
+    {
+        public Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> Object { get; }
+
+        internal ActionInnerMock()
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9, T10 p10) => Exec();
+        }
+
+        internal ActionInnerMock(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> chainAction)
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9, T10 p10) =>
+            {
+                Exec();
+                chainAction?.Invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
+            };
+        }
+    }
+
+    public class ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : CallableMock
+    {
+        public Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> Object { get; }
+
+        internal ActionInnerMock()
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9, T10 p10, T11 p11) => Exec();
+        }
+
+        internal ActionInnerMock(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9,
+            T10, T11> chainAction)
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9,
+                T10 p10, T11 p11) =>
+            {
+                Exec();
+                chainAction?.Invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
+            };
+        }
+    }
+
+    public class ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : CallableMock
+    {
+        public Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> Object { get; }
+
+        internal ActionInnerMock()
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9,
+                T10 p10, T11 p11, T12 p12) => Exec();
+        }
+
+        internal ActionInnerMock(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9,
+            T10, T11, T12> chainAction)
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9,
+                T10 p10, T11 p11, T12 p12) =>
+            {
+                Exec();
+                chainAction?.Invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9,
+                    p10, p11, p12);
+            };
+        }
+    }
+
+    public class ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> : CallableMock
+    {
+        public Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> Object { get; }
+
+        internal ActionInnerMock()
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9,
+                T10 p10, T11 p11, T12 p12, T13 p13) => Exec();
+        }
+
+        internal ActionInnerMock(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9,
+            T10, T11, T12, T13> chainAction)
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9,
+                T10 p10, T11 p11, T12 p12, T13 p13) =>
+            {
+                Exec();
+                chainAction?.Invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9,
+                    p10, p11, p12, p13);
+            };
+        }
+    }
+
+    public class ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> : CallableMock
+    {
+        public Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> Object { get; }
+
+        internal ActionInnerMock()
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9,
+                T10 p10, T11 p11, T12 p12, T13 p13, T14 p14) => Exec();
+        }
+
+        internal ActionInnerMock(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9,
+            T10, T11, T12, T13, T14> chainAction)
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9,
+                T10 p10, T11 p11, T12 p12, T13 p13, T14 p14) =>
+            {
+                Exec();
+                chainAction?.Invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9,
+                    p10, p11, p12, p13, p14);
+            };
+        }
+    }
+
+    public class ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> : CallableMock
+    {
+        public Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> Object { get; }
+
+        internal ActionInnerMock()
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9,
+                T10 p10, T11 p11, T12 p12, T13 p13, T14 p14, T15 p15) => Exec();
+        }
+
+        internal ActionInnerMock(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9,
+            T10, T11, T12, T13, T14, T15> chainAction)
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9,
+                T10 p10, T11 p11, T12 p12, T13 p13, T14 p14, T15 p15) =>
+            {
+                Exec();
+                chainAction?.Invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9,
+                    p10, p11, p12, p13, p14, p15);
+            };
+        }
+    }
+    public class ActionInnerMock<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> : CallableMock
+    {
+        public Action<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> Object { get; }
+
+        internal ActionInnerMock()
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9,
+                T10 p10, T11 p11, T12 p12, T13 p13, T14 p14, T15 p15, T16 p16) => Exec();
+        }
+
+        internal ActionInnerMock(Action<T1, T2, T3, T4, T5, T6, T7, T8, T9,
+            T10, T11, T12, T13, T14, T15, T16> chainAction)
+        {
+            Object = (T1 p1, T2 p2, T3 p3, T4 p4, T5 p5, T6 p6, T7 p7, T8 p8, T9 p9,
+                T10 p10, T11 p11, T12 p12, T13 p13, T14 p14, T15 p15, T16 p16) =>
+            {
+                Exec();
+                chainAction?.Invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9,
+                    p10, p11, p12, p13, p14, p15, p16);
             };
         }
     }
