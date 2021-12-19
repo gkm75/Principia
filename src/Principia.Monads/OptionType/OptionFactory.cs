@@ -4,7 +4,7 @@ namespace Principia.Monads
 {
     public static class Option
     {
-        public static Monad<T> Pure<T>(T value) => Some(value);
+        public static Monad<T> Pure<T>(T value) => From(value);
 
         public static Option<T> Some<T>(T value) => new Option<T>(true, value);
 
@@ -16,7 +16,7 @@ namespace Principia.Monads
         {
             try
             {
-                return Option.Some(tryFn());
+                return Option.From(tryFn());
             }
             catch
             {

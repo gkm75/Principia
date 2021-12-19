@@ -90,20 +90,23 @@ namespace Principia.Monads
             return option;
         }
 
+        public static U Substitute<T, U>(this Option<T> option, U some, U none)
+            => (option.IsSome) ? some : none;
+
         public static Option<T> OnNone<T>(this Option<T> option, Func<T> noneFn)
-            => (option.IsNone && noneFn != null) ? Option.Some(noneFn()) : option;
+            => (option.IsNone && noneFn != null) ? Option.From(noneFn()) : option;
 
         public static Option<T> OnNone<T>(this Option<T> option, Func<Option<T>> noneFn)
             => (option.IsNone && noneFn!=null) ? noneFn() : option;
 
         public static Option<T> OnSome<T>(this Option<T> option, Func<T, T> someFn)
-            => (option.IsSome && someFn != null) ? Option.Some(someFn(option.Value)) : option;
+            => (option.IsSome && someFn != null) ? Option.From(someFn(option.Value)) : option;
 
         public static Option<T> OnSome<T>(this Option<T> option, Func<Option<T>, Option<T>> someFn)
             => (option.IsSome && someFn != null) ? someFn(option) : option;
 
         public static Option<U> Bimap<T, U>(this Option<T> option, Func<T, U> someFn, Func<U> noneFn)
-            => (option.IsSome && someFn != null) ? Option.Some(someFn(option.Value)) : ((noneFn == null) ? Option.None<U>() : Option.Some(noneFn()));
+            => (option.IsSome && someFn != null) ? Option.From(someFn(option.Value)) : ((noneFn == null) ? Option.None<U>() : Option.From(noneFn()));
 
         public static Option<U> Bimap<T, U>(this Option<T> option, Func<Option<T>, Option<U>> someFn, Func<Option<U>> noneFn)
             => (option.IsSome && someFn != null) ? someFn(option) : ((noneFn == null) ? Option.None<U>() : noneFn());
@@ -124,14 +127,14 @@ namespace Principia.Monads
             if (optionAdd.IsNone || option.IsNone)
                 return Option.None<T>();
 
-            return Option.Some(multiplicativeFn(option.Value, optionAdd.Value));
+            return Option.From(multiplicativeFn(option.Value, optionAdd.Value));
         }
 
         public static Option<U> Try<T, U>(this Option<T> option, Func<T, U> tryFn)
         {
             try
             {
-                return Option.Some(tryFn(option.Value));
+                return Option.From(tryFn(option.Value));
             }
             catch
             {

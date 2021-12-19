@@ -167,6 +167,11 @@ namespace Principia.Monads
             return result;
         }
 
+        public static async Task<U> SubstituteAsync<TOk, TFail, U>(this Task<Result<TOk, TFail>> resultTask, U ok, U fail)
+        {
+            var result = await resultTask;
+            return (result.IsOk) ? ok : fail;
+        }
 
         public static Task<Result<TOk, TFail>> OnOkAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>> okFn)
             => resultTask.ContinueWith(task => task.Result.IsOk && okFn != null ? okFn() : task.Result);

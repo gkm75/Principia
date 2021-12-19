@@ -4,15 +4,20 @@ namespace Principia.Monads
 {
     public static class Result
     {
-        public static Monad<TOk> Pure<TOk>(TOk value) => Ok<TOk, TOk>(value);
+        public static Monad<TOk> Pure<TOk>(TOk value) => From<TOk, TOk>(value);
 
-        public static Monad<TOk> Pure<TOk, TFail>(TOk value) => Ok<TOk, TFail>(value);
+        public static Monad<TOk> Pure<TOk, TFail>(TOk value) => From<TOk, TFail>(value);
 
         public static Result<TOk, TFail> Ok<TOk, TFail>(TOk ok)
             => new ResultOk<TOk, TFail>(ok);
 
         public static Result<TOk, TFail> Fail<TOk, TFail>(TFail fail)
             => new ResultFail<TOk, TFail>(fail);
+
+        public static Result<TOk, TFail> From<TOk, TFail>(TOk ok)
+            => ok == null 
+                ? Fail<TOk, TFail>(default(TFail)) 
+                : Ok<TOk, TFail>(ok);
 
         public static Result<TOk, TFail> FromOr<TOk, TFail>(TOk ok, TFail fail)
             => ok == null 
@@ -35,7 +40,7 @@ namespace Principia.Monads
         {
             try
             {
-                return Ok<TOk, TFail>(tryFn());
+                return FromOr<TOk, TFail>(tryFn());
             }
             catch
             {

@@ -101,6 +101,12 @@ namespace Principia.Monads.ResultType
             return result;
         }
 
+        public static U Substitute<TOk, TFail, U>(this Result<TOk, TFail> result, U ok, U fail)
+            => (result.IsOk) ? ok : fail;
+
+        public static Result<TOk, TFail> OnOk<TOk, TFail>(this Result<TOk, TFail> result, Func<TOk> okFn)
+            => (result.IsOk && okFn != null) ? Result.From(okFn()) : result;
+
         public static Result<TOk, TFail> OnOk<TOk, TFail>(this Result<TOk, TFail> result, Func<Result<TOk, TFail>> okFn)
             => (result.IsOk && okFn != null) ? okFn() : result;
 
@@ -151,7 +157,7 @@ namespace Principia.Monads.ResultType
         {
             try
             {
-                return Result.Ok<TOk, TFail>(tryFn(result.Value));
+                return Result.FromOr<TOk, TFail>(tryFn(result.Value));
             }
             catch
             {

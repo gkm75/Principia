@@ -6,7 +6,7 @@ namespace Principia.Monads
     public static class OptionExtensionsAsync
     {
         public static async Task<Monad<T>> PureAsync<T>(this Task<T> task)
-            => Option.Some(await task);
+            => Option.From(await task);
 
         public static Task<T> ValueOrAsync<T>(this Option<Task<T>> option, T fallback)
             => option.IsSome ? option.Value : Task.FromResult(fallback);
@@ -303,9 +303,22 @@ namespace Principia.Monads
             return option;
         }
 
+        public static async Task<U> SubstituteAsync<T, U>(this Task<Option<T>> optionTask, U some, U none)
+        {
+            var option = await optionTask;
+            return (option.IsSome) 
+                ? Task.FromResult(some) 
+                : Task.FromResult(none);
+        }
+        public static async Task<U> SubstituteAsync<T, U>(this Task<Option<T>> option, Task<U> some, Task<U> none)
+        {
+            var option = await optionTask;
+            return (option.IsSome) ? some : none;
+        }
+
         public static Task<Option<T>> OnNoneAsync<T>(this Task<Option<T>> optionTask, Func<T> noneFn)
             => optionTask.ContinueWith(
-                task => (task.Result.IsNone && noneFn != null) ? Option.Some(noneFn()) : task.Result
+                task => (task.Result.IsNone && noneFn != null) ? Option.From(noneFn()) : task.Result
                 , TaskContinuationOptions.OnlyOnRanToCompletion);
 
         public static Task<Option<T>> OnNoneAsync<T>(this Task<Option<T>> optionTask, Func<Option<T>> noneFn)
@@ -314,14 +327,14 @@ namespace Principia.Monads
                 , TaskContinuationOptions.OnlyOnRanToCompletion);
 
         public static async Task<Option<T>> OnNoneAsync<T>(this Option<T> option, Func<Task<T>> noneAsyncFn)
-            => (option.IsNone && noneAsyncFn != null) ? Option.Some(await noneAsyncFn()) : option;
+            => (option.IsNone && noneAsyncFn != null) ? Option.From(await noneAsyncFn()) : option;
 
         public static async Task<Option<T>> OnNoneAsync<T>(this Option<T> option, Func<Task<Option<T>>> noneAsyncFn)
             => (option.IsNone && noneAsyncFn != null) ? (await noneAsyncFn()) : option;
 
         public static Task<Option<T>> OnSomeAsync<T>(this Task<Option<T>> optionTask, Func<T, T> someFn)
             => optionTask.ContinueWith(
-                task => (task.Result.IsSome && someFn != null) ? Option.Some(someFn(task.Result.Value)) : task.Result
+                task => (task.Result.IsSome && someFn != null) ? Option.From(someFn(task.Result.Value)) : task.Result
                 , TaskContinuationOptions.OnlyOnRanToCompletion);
 
         public static Task<Option<T>> OnSomeAsync<T>(this Task<Option<T>> optionTask, Func<Option<T>, Option<T>> someFn)
@@ -330,7 +343,7 @@ namespace Principia.Monads
                 , TaskContinuationOptions.OnlyOnRanToCompletion);
 
         public static async Task<Option<T>> OnSomeAsync<T>(this Option<T> option, Func<T, Task<T>> someAsyncFn)
-            => (option.IsSome && someAsyncFn != null) ? Option.Some(await someAsyncFn(option.Value)) : option;
+            => (option.IsSome && someAsyncFn != null) ? Option.From(await someAsyncFn(option.Value)) : option;
 
         public static async Task<Option<T>> OnSomeAsync<T>(this Option<T> option, Func<Option<T>, Task<Option<T>>> someAsyncFn)
             => (option.IsSome && someAsyncFn != null) ? (await someAsyncFn(option)) : option;
@@ -338,8 +351,8 @@ namespace Principia.Monads
         public static Task<Option<U>> BimapAsync<T, U>(this Task<Option<T>> optionTask, Func<T, U> someFn, Func<U> noneFn)
             => optionTask.ContinueWith(
                 task => (task.Result.IsSome && someFn != null)
-                        ? Option.Some(someFn(task.Result.Value))
-                        : (noneFn == null) ? Option.None<U>() : Option.Some(noneFn())
+                        ? Option.From(someFn(task.Result.Value))
+                        : (noneFn == null) ? Option.None<U>() : Option.From(noneFn())
                     , TaskContinuationOptions.OnlyOnRanToCompletion);
 
         public static Task<Option<U>> BimapAsync<T, U>(this Task<Option<T>> optionTask, Func<Option<T>, Option<U>> someFn, Func<Option<U>> noneFn)
@@ -351,8 +364,8 @@ namespace Principia.Monads
 
         public static async Task<Option<U>> BimapAsync<T, U>(this Option<T> option, Func<T, Task<U>> someAsyncFn, Func<Task<U>> noneAsyncFn)
             => (option.IsSome && someAsyncFn != null) 
-                ? Option.Some(await someAsyncFn(option.Value)) 
-                : ((noneAsyncFn == null) ? Option.None<U>() : Option.Some(await noneAsyncFn()));
+                ? Option.From(await someAsyncFn(option.Value)) 
+                : ((noneAsyncFn == null) ? Option.None<U>() : Option.From(await noneAsyncFn()));
         
 
         public static Task<Option<U>> BimapAsync<T, U>(this Option<T> option, Func<Option<T>, Task<Option<U>>> someAsyncFn, Func<Task<Option<U>>> noneAsyncFn)
@@ -364,9 +377,9 @@ namespace Principia.Monads
         {
             var option = await optionTask;
             if (option.IsSome && someAsyncFn != null)
-                return Option.Some(await someAsyncFn(option.Value)); 
+                return Option.From(await someAsyncFn(option.Value)); 
             
-            return ((noneAsyncFn == null) ? Option.None<U>() : Option.Some(await noneAsyncFn()));
+            return ((noneAsyncFn == null) ? Option.None<U>() : Option.From(await noneAsyncFn()));
         }
 
         public static async Task<Option<U>> BimapAsync<T, U>(this Task<Option<T>> optionTask, Func<Option<T>, Task<Option<U>>> someAsyncFn, Func<Task<Option<U>>> noneAsyncFn)
@@ -389,7 +402,7 @@ namespace Principia.Monads
                         if (optionTask.Result.IsNone)
                             return optionAddTask.Result;
 
-                        return Option.Some(additiveFn(optionTask.Result.Value, optionAddTask.Result.Value));
+                        return Option.From(additiveFn(optionTask.Result.Value, optionAddTask.Result.Value));
                     }, TaskContinuationOptions.OnlyOnRanToCompletion );
 
         public static async Task<Option<T>> CombineAdditiveAsync<T>(this Option<T> option, Option<T> optionAdd, Func<T, T, Task<T>> additiveAsyncFn)
@@ -400,7 +413,7 @@ namespace Principia.Monads
             if (option.IsNone)
                 return optionAdd;
 
-            return Option.Some(await additiveAsyncFn(option.Value, optionAdd.Value));
+            return Option.From(await additiveAsyncFn(option.Value, optionAdd.Value));
         }
 
         public static async Task<Option<T>> CombineAdditiveAsync<T>(this Task<Option<T>> optionTask, Task<Option<T>> optionAddTask, Func<T, T, Task<T>> additiveAsyncFn)
@@ -412,7 +425,7 @@ namespace Principia.Monads
             if (optionTask.Result.IsNone)
                 return optionAddTask.Result;
 
-            return Option.Some(await additiveAsyncFn(optionTask.Result.Value, optionAddTask.Result.Value));
+            return Option.From(await additiveAsyncFn(optionTask.Result.Value, optionAddTask.Result.Value));
         }
 
         public static Task<Option<T>> CombineMultiplicativeAsync<T>(this Task<Option<T>> optionTask, Task<Option<T>> optionAddTask, Func<T, T, T> multiplicativeFn)
@@ -423,7 +436,7 @@ namespace Principia.Monads
                         if (optionAddTask.Result.IsNone || optionTask.Result.IsNone)
                             return Option.None<T>();
 
-                        return Option.Some(multiplicativeFn(optionTask.Result.Value, optionAddTask.Result.Value));
+                        return Option.From(multiplicativeFn(optionTask.Result.Value, optionAddTask.Result.Value));
                     }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
         public static async Task<Option<T>> CombineMultiplicativeAsync<T>(this Option<T> option, Option<T> optionAdd, Func<T, T, Task<T>> multiplicativeAsyncFn)
@@ -431,7 +444,7 @@ namespace Principia.Monads
             if (optionAdd.IsNone || option.IsNone)
                 return Option.None<T>();
 
-            return Option.Some(await multiplicativeAsyncFn(option.Value, optionAdd.Value));
+            return Option.From(await multiplicativeAsyncFn(option.Value, optionAdd.Value));
         }
 
         public static async Task<Option<T>> CombineMultiplicativeAsync<T>(this Task<Option<T>> optionTask, Task<Option<T>> optionAddTask, Func<T, T, Task<T>> multiplicativeAsyncFn)
@@ -440,7 +453,7 @@ namespace Principia.Monads
             if (optionAddTask.Result.IsNone || optionTask.Result.IsNone)
                 return Option.None<T>();
 
-            return Option.Some(await multiplicativeAsyncFn(optionTask.Result.Value, optionAddTask.Result.Value));
+            return Option.From(await multiplicativeAsyncFn(optionTask.Result.Value, optionAddTask.Result.Value));
         }
 
         public static async Task <Option<U>> TryAsync<T, U>(this Task<Option<T>> optionTask, Func<T, U> tryFn)
@@ -448,7 +461,7 @@ namespace Principia.Monads
             var option = await optionTask;
             try
             {
-                return Option.Some(tryFn(option.Value));
+                return Option.From(tryFn(option.Value));
             }
             catch
             {
@@ -460,7 +473,7 @@ namespace Principia.Monads
         {
             try
             {
-                return Option.Some(await tryAsyncFn(option.Value));
+                return Option.From(await tryAsyncFn(option.Value));
             }
             catch
             {
@@ -473,7 +486,7 @@ namespace Principia.Monads
             var option = await optionTask;
             try
             {
-                return Option.Some(await tryAsyncFn(option.Value));
+                return Option.From(await tryAsyncFn(option.Value));
             }
             catch
             {
