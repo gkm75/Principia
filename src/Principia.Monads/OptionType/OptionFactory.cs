@@ -12,6 +12,8 @@ namespace Principia.Monads
 
         public static Option<T> From<T>(T value) => value == null ? None<T>() : Some(value);
 
+        public static Option<T> FromFunc<T>(Func<T> fromFn) => fromFn == null ? None<T>() : From(fromFn());
+
         public static Option<T> Try<T>(Func<T> tryFn)
         {
             try

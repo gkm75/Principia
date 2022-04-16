@@ -23,118 +23,141 @@ namespace Principia.Monads
         public static Task<Option<T>> JoinAsync<T>(this Option<Task<Option<T>>> option)
             => option.IsSome ? option.Value : Task.FromResult(Option.None<T>());
 
-        public static Task<Option<T>> BindAsync<T>(this Task<Option<T>> optionTask, Func<T, Option<T>> bindFn)
-            => optionTask.ContinueWith(task => task.Result.IsSome ? bindFn(task.Result.Value) : task.Result,
-                TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<T>> BindAsync<T>(this Task<Option<T>> optionTask, Func<T, Option<T>> bindFn)
+        {
+            var option = await optionTask;
+            return bindFn(option.Value);
+        }
 
         public static Task<Option<T>> BindAsync<T>(this Option<T> option, Func<T, Task<Option<T>>> bindFnTask)
             => option.IsSome ? bindFnTask(option.Value) : Task.FromResult(Option.None<T>());
 
-        public static Task<Option<T>> BindAsync<T>(this Task<Option<T>> optionTask, Func<T, Task<Option<T>>> bindFnAsync)
-            => optionTask
-                .ContinueWith(
-                    task => task.Result.IsSome ? bindFnAsync(task.Result.Value) : optionTask,
-                    TaskContinuationOptions.OnlyOnRanToCompletion)
-                .ContinueWith(task => task.Result.Result, TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<T>> BindAsync<T>(this Task<Option<T>> optionTask, Func<T, Task<Option<T>>> bindFnAsync)
+        {
+            var option = await optionTask;
+            return option.IsSome ? await bindFnAsync(option.Value) : Option.None<T>();
+        }
+ 
+        public static async Task<Option<U>> MapAsync<T, U>(this Task<Option<T>> optionTask, Func<T, U> mapFn)
+        {
+            var option = await optionTask;
+            return option.IsSome ? Option.From(mapFn(option.Value)) : Option.None<U>();
+        }
 
-        public static Task<Option<U>> MapAsync<T, U>(this Task<Option<T>> optionTask, Func<T, U> mapFn)
-            => optionTask.ContinueWith(
-                task => task.Result.IsSome
-                    ? Option.From(mapFn(task.Result.Value))
-                    : Option.None<U>(), TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<U>> MapAsync<T, U>(this Option<T> option, Func<T, Task<U>> mapFnAsync) 
+            => option.IsSome ? Option.From(await mapFnAsync(option.Value)) : Option.None<U>();
 
-        public static Task<Option<U>> MapAsync<T, U>(this Option<T> option, Func<T, Task<U>> mapFnAsync)
-            => option.IsSome
-                ? mapFnAsync(option.Value).ContinueWith(task => Option.From(task.Result), TaskContinuationOptions.OnlyOnRanToCompletion)
-                : Task.FromResult(Option.None<U>());
+        public static async Task<Option<U>> MapAsync<T, U>(this Task<Option<T>> optionTask, Func<T, Task<U>> mapFnAsync)
+        {
+            var option = await optionTask;
+            return option.IsSome ? Option.From(await mapFnAsync(option.Value)) : Option.None<U>();
+        }
 
-        public static Task<Option<U>> MapAsync<T, U>(this Task<Option<T>> optionTask, Func<T, Task<U>> mapFnAsync)
-            => optionTask
-                .ContinueWith(
-                    task => task.Result.IsSome
-                        ? mapFnAsync(task.Result.Value).ContinueWith(inner => Option.From(inner.Result), TaskContinuationOptions.OnlyOnRanToCompletion)
-                        : Task.FromResult(Option.None<U>()), TaskContinuationOptions.OnlyOnRanToCompletion)
-                .ContinueWith(task => task.Result.Result, TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<U>> MapAsync<T, U>(this Option<T> option, Task<Func<T, U>> mapFnTask)
+        {
+            return option.IsSome
+                    ? Option.From((await mapFnTask)(option.Value))
+                    : Option.None<U>();
+        }
 
-        public static Task<Option<U>> MapAsync<T, U>(this Option<T> option, Task<Func<T, U>> mapFnTask)
-                => option.IsSome
-                    ? mapFnTask.ContinueWith(task => Option.From(task.Result(option.Value)), TaskContinuationOptions.OnlyOnRanToCompletion)
-                    : Task.FromResult(Option.None<U>());
+        public static async Task<Option<U>> MapAsync<T, U>(this Task<Option<T>> optionTask, Task<Func<T, U>> mapFnTask)
+        {
+            var option = await optionTask;
+            return option.IsSome
+                    ? Option.From((await mapFnTask)(option.Value))
+                    : Option.None<U>();
+        }
 
-        public static Task<Option<U>> MapAsync<T, U>(this Task<Option<T>> optionTask, Task<Func<T, U>> mapFnTask)
-            => Task.WhenAll(optionTask, mapFnTask)
-                .ContinueWith(
-                    _ => optionTask.Result.IsSome
-                        ? Option.From(mapFnTask.Result(optionTask.Result.Value))
-                        : Option.None<U>(), TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<U>> SwitchMap<T, U>(this Task<Option<T>> optionTask, Func<U> mapFn)
+        {
+            var option = await optionTask;
+            return option.IsNone ? Option.From(mapFn()) : Option.None<U>();
+        }
 
-        public static Task<Option<U>> ApplicativeAsync<T, U>(this Task<Option<T>> optionTask, Option<Func<T, U>> optionMapFn)
-            => optionTask
-                .ContinueWith(task => task.Result.IsSome
-                    ? Option.From(optionMapFn.Value(task.Result.Value))
-                    : Option.None<U>(), TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<U>> SwitchMap<T, U>(this Option<T> option, Func<Task<U>> mapFnAsync)
+            => option.IsNone ? Option.From(await mapFnAsync()) : Option.None<U>();
 
-        public static Task<Option<U>> ApplicativeAsync<T, U>(this Option<T> option, Option<Func<T, Task<U>>> optionMapFnAsync)
-            => option.IsSome && optionMapFnAsync.IsSome
-                ? optionMapFnAsync.Value(option.Value).ContinueWith(inner => Option.From(inner.Result))
-                : Task.FromResult(Option.None<U>());
+        public static async Task<Option<U>> SwitchMap<T, U>(this Task<Option<T>> optionTask, Func<Task<U>> mapFnAsync)
+        {
+            var option = await optionTask;
+            return option.IsNone ? Option.From(await mapFnAsync()) : Option.None<U>();
+        }
 
-        public static Task<Option<U>> ApplicativeAsync<T, U>(this Task<Option<T>> optionTask, Option<Func<T, Task<U>>> optionMapFnAsync)
-            => optionTask
-                .ContinueWith(
-                    task => task.Result.IsSome
-                        ? optionMapFnAsync.Value(task.Result.Value).ContinueWith(inner => Option.From(inner.Result))
-                        : Task.FromResult(Option.None<U>()), TaskContinuationOptions.OnlyOnRanToCompletion)
-                .ContinueWith(task => task.Result.Result, TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<U>> SwitchMap<T, U>(this Option<T> option, Task<Func<U>> mapFnTask) 
+            => option.IsNone ? Option.From((await mapFnTask)()) : Option.None<U>();
 
-        public static Task<Option<U>> ApplicativeAsync<T, U>(this Option<T> option, Task<Option<Func<T, U>>> optionMapFnTask)
-            => option.IsSome
-                ? optionMapFnTask
-                    .ContinueWith(task => task.Result.IsSome
-                        ? Option.From(task.Result.Value(option.Value))
-                        : Option.None<U>(), TaskContinuationOptions.OnlyOnRanToCompletion)
-                : Task.FromResult(Option.None<U>());
+        public static async Task<Option<U>> SwitchMap<T, U>(this Task<Option<T>> optionTask, Task<Func<U>> mapFnTask)
+        {
+            var option = await optionTask;
+            return option.IsNone ? Option.From((await mapFnTask)()) : Option.None<U>();
+        }
 
-        public static Task<Option<U>> ApplicativeAsync<T, U>(this Task<Option<T>> optionTask, Task<Option<Func<T, U>>> optionMapFnTask)
-            => Task.WhenAll(optionTask, optionMapFnTask)
-                .ContinueWith(
-                    _ => optionTask.Result.IsSome && optionMapFnTask.Result.IsSome
-                        ? Option.From(optionMapFnTask.Result.Value(optionTask.Result.Value))
-                        : Option.None<U>(), TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<U>> ApplicativeAsync<T, U>(this Task<Option<T>> optionTask, Option<Func<T, U>> optionMapFn)
+        {
+            var option = await optionTask;
+            return option.IsSome
+                        ? Option.From(optionMapFn.Value(option.Value))
+                        : Option.None<U>();
+        }
 
-        public static Task<Option<T>> WhenSomeAsync<T>(this Task<Option<T>> optionTask, Action action)
-            => optionTask.ContinueWith(
-                task =>
-                {
-                    if (task.Result.IsSome)
-                        action?.Invoke();
+        public static async Task<Option<U>> ApplicativeAsync<T, U>(this Option<T> option, Option<Func<T, Task<U>>> optionMapFnAsync)
+        {
+            return option.IsSome && optionMapFnAsync.IsSome
+                           ? Option.From(await optionMapFnAsync.Value(option.Value))
+                           : Option.None<U>();
+        }
 
-                    return task.Result;
-                }
-                , TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<U>> ApplicativeAsync<T, U>(this Task<Option<T>> optionTask, Option<Func<T, Task<U>>> optionMapFnAsync)
+        {
+            var option = await optionTask;
+            return option.IsSome && optionMapFnAsync.IsSome
+                    ? Option.From(await optionMapFnAsync.Value(option.Value))
+                    : Option.None<U>();
+        }
 
+        public static async Task<Option<U>> ApplicativeAsync<T, U>(this Option<T> option, Task<Option<Func<T, U>>> optionMapFnTask)
+        {
+            var optionMapFn = await optionMapFnTask;
+            return option.IsSome && optionMapFn.IsSome
+                    ? Option.From(optionMapFn.Value(option.Value))
+                    : Option.None<U>();
+        }
 
-        public static Task<Option<T>> WhenSomeAsync<T>(this Task<Option<T>> optionTask, Action<T> action)
-            => optionTask.ContinueWith(
-                task =>
-                {
-                    if (task.Result.IsSome)
-                        action?.Invoke(task.Result.Value);
+        public static async Task<Option<U>> ApplicativeAsync<T, U>(this Task<Option<T>> optionTask, Task<Option<Func<T, U>>> optionMapFnTask)
+        {
+            await Task.WhenAll(optionTask, optionMapFnTask);
+            return optionTask.Result.IsSome && optionMapFnTask.Result.IsSome
+                    ? Option.From(optionMapFnTask.Result.Value(optionTask.Result.Value))
+                    : Option.None<U>();
+        }
 
-                    return task.Result;
-                }
-                , TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<T>> WhenSomeAsync<T>(this Task<Option<T>> optionTask, Action action)
+        {
+            var option = await optionTask;
+            if (option.IsSome)
+                action?.Invoke();
 
-        public static Task<Option<T>> WhenSomeAsync<T>(this Task<Option<T>> optionTask, Action<Option<T>> action)
-        => optionTask.ContinueWith(
-                task =>
-                {
-                    if (task.Result.IsSome)
-                        action?.Invoke(task.Result);
+            return option; 
+        }
 
-                    return task.Result;
-                }
-                , TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<T>> WhenSomeAsync<T>(this Task<Option<T>> optionTask, Action<T> action)
+        {
+            var option = await optionTask;
+            if (option.IsSome)
+                action?.Invoke(option.Value);
+
+            return option;
+        }
+
+        public static async Task<Option<T>> WhenSomeAsync<T>(this Task<Option<T>> optionTask, Action<Option<T>> action)
+        {
+            var option = await optionTask;
+            if (option.IsSome)
+                action?.Invoke(option);
+
+            return option;
+
+        }
 
         public static async Task<Option<T>> WhenSomeAsync<T>(this Option<T> option, Func<Task> asyncFn)
         {
@@ -187,16 +210,14 @@ namespace Principia.Monads
             return option;
         }
 
-        public static Task<Option<T>> WhenNoneAsync<T>(this Task<Option<T>> optionTask, Action action)
-            => optionTask.ContinueWith(
-                task =>
-                {
-                    if (task.Result.IsNone)
-                        action?.Invoke();
+        public static async Task<Option<T>> WhenNoneAsync<T>(this Task<Option<T>> optionTask, Action action)
+        {
+            var option = await optionTask;
+            if (option.IsNone)
+                action?.Invoke();
 
-                    return task.Result;
-                }
-                , TaskContinuationOptions.OnlyOnRanToCompletion);
+            return option;
+        }
 
         public static async Task<Option<T>> WhenNoneAsync<T>(this Option<T> option, Func<Task> asyncFn)
         {
@@ -215,36 +236,38 @@ namespace Principia.Monads
             return option;
         }
 
+        public static async Task<Option<T>> MatchAsync<T>(this Task<Option<T>> optionTask, Action actionSome, Action actionNone)
+        {
+            var option = await optionTask;
+            if (option.IsSome)
+                actionSome?.Invoke();
+            else
+                actionNone?.Invoke();
 
-        public static Task<Option<T>> MatchAsync<T>(this Task<Option<T>> optionTask, Action actionSome, Action actionNone)
-            => optionTask.ContinueWith(task => {
-                if (task.Result.IsSome)
-                    actionSome?.Invoke();
-                else
-                    actionNone?.Invoke();
+            return option;
+        }
 
-                return task.Result;
-            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<T>> MatchAsync<T>(this Task<Option<T>> optionTask, Action<T> actionSome, Action actionNone)
+        {
+            var option = await optionTask;
+            if (option.IsSome)
+                actionSome?.Invoke(option.Value);
+            else
+                actionNone?.Invoke();
 
-        public static Task<Option<T>> MatchAsync<T>(this Task<Option<T>> optionTask, Action<T> actionSome, Action actionNone)
-            => optionTask.ContinueWith(task => {
-                if (task.Result.IsSome)
-                    actionSome?.Invoke(task.Result.Value);
-                else
-                    actionNone?.Invoke();
+            return option;
+        }
 
-                return task.Result;
-            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<T>> MatchAsync<T>(this Task<Option<T>> optionTask, Action<Option<T>> actionSome, Action actionNone)
+        {
+            var option = await optionTask;
+            if (option.IsSome)
+                actionSome?.Invoke(option);
+            else
+                actionNone?.Invoke();
 
-        public static Task<Option<T>> MatchAsync<T>(this Task<Option<T>> optionTask, Action<Option<T>> actionSome, Action actionNone)
-            => optionTask.ContinueWith(task => {
-                if (task.Result.IsSome)
-                    actionSome?.Invoke(task.Result);
-                else
-                    actionNone?.Invoke();
-
-                return task.Result;
-            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+            return option;
+        }
 
         public static async Task<Option<T>> MatchAsync<T>(this Option<T> option, Func<Task> someAsyncFn, Func<Task> noneAsyncFn)
         {
@@ -307,24 +330,27 @@ namespace Principia.Monads
         {
             var option = await optionTask;
             return (option.IsSome) 
-                ? Task.FromResult(some) 
-                : Task.FromResult(none);
+                ? some 
+                : none;
         }
-        public static async Task<U> SubstituteAsync<T, U>(this Task<Option<T>> option, Task<U> some, Task<U> none)
+
+        public static async Task<U> SubstituteAsync<T, U>(this Task<Option<T>> optionTask, Task<U> some, Task<U> none)
         {
             var option = await optionTask;
-            return (option.IsSome) ? some : none;
+            return await ((option.IsSome) ? some : none);
         }
 
-        public static Task<Option<T>> OnNoneAsync<T>(this Task<Option<T>> optionTask, Func<T> noneFn)
-            => optionTask.ContinueWith(
-                task => (task.Result.IsNone && noneFn != null) ? Option.From(noneFn()) : task.Result
-                , TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<T>> OnNoneAsync<T>(this Task<Option<T>> optionTask, Func<T> noneFn)
+        {
+            var option = await optionTask;
+            return (option.IsNone && noneFn != null) ? Option.From(noneFn()) : option;
+        }
 
-        public static Task<Option<T>> OnNoneAsync<T>(this Task<Option<T>> optionTask, Func<Option<T>> noneFn)
-            => optionTask.ContinueWith(
-                task => (task.Result.IsNone && noneFn != null) ? noneFn() : task.Result
-                , TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<T>> OnNoneAsync<T>(this Task<Option<T>> optionTask, Func<Option<T>> noneFn)
+        {
+            var option = await optionTask;
+            return (option.IsNone && noneFn != null) ? noneFn() : option;
+        }
 
         public static async Task<Option<T>> OnNoneAsync<T>(this Option<T> option, Func<Task<T>> noneAsyncFn)
             => (option.IsNone && noneAsyncFn != null) ? Option.From(await noneAsyncFn()) : option;
@@ -332,15 +358,18 @@ namespace Principia.Monads
         public static async Task<Option<T>> OnNoneAsync<T>(this Option<T> option, Func<Task<Option<T>>> noneAsyncFn)
             => (option.IsNone && noneAsyncFn != null) ? (await noneAsyncFn()) : option;
 
-        public static Task<Option<T>> OnSomeAsync<T>(this Task<Option<T>> optionTask, Func<T, T> someFn)
-            => optionTask.ContinueWith(
-                task => (task.Result.IsSome && someFn != null) ? Option.From(someFn(task.Result.Value)) : task.Result
-                , TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<T>> OnSomeAsync<T>(this Task<Option<T>> optionTask, Func<T, T> someFn)
+        {
+            var option = await optionTask;
+            return (option.IsSome && someFn != null) ? Option.From(someFn(option.Value)) : option;
+        }
 
-        public static Task<Option<T>> OnSomeAsync<T>(this Task<Option<T>> optionTask, Func<Option<T>, Option<T>> someFn)
-            => optionTask.ContinueWith(
-                task => (task.Result.IsSome && someFn != null) ? (someFn(task.Result)) : task.Result
-                , TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<T>> OnSomeAsync<T>(this Task<Option<T>> optionTask, Func<Option<T>, Option<T>> someFn)
+        {
+            var option = await optionTask;
+            return (option.IsSome && someFn != null) ? (someFn(option)) : option;
+        }
+          
 
         public static async Task<Option<T>> OnSomeAsync<T>(this Option<T> option, Func<T, Task<T>> someAsyncFn)
             => (option.IsSome && someAsyncFn != null) ? Option.From(await someAsyncFn(option.Value)) : option;
@@ -348,25 +377,26 @@ namespace Principia.Monads
         public static async Task<Option<T>> OnSomeAsync<T>(this Option<T> option, Func<Option<T>, Task<Option<T>>> someAsyncFn)
             => (option.IsSome && someAsyncFn != null) ? (await someAsyncFn(option)) : option;
 
-        public static Task<Option<U>> BimapAsync<T, U>(this Task<Option<T>> optionTask, Func<T, U> someFn, Func<U> noneFn)
-            => optionTask.ContinueWith(
-                task => (task.Result.IsSome && someFn != null)
-                        ? Option.From(someFn(task.Result.Value))
-                        : (noneFn == null) ? Option.None<U>() : Option.From(noneFn())
-                    , TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<U>> BimapAsync<T, U>(this Task<Option<T>> optionTask, Func<T, U> someFn, Func<U> noneFn)
+        {
+            var option = await optionTask;
+            return Option.From(option.IsSome
+                ? someFn(option.Value)
+                : noneFn());
+        }
 
-        public static Task<Option<U>> BimapAsync<T, U>(this Task<Option<T>> optionTask, Func<Option<T>, Option<U>> someFn, Func<Option<U>> noneFn)
-            => optionTask.ContinueWith(
-                    task => (task.Result.IsSome && someFn != null)
-                                ? someFn(task.Result)
-                                : (noneFn == null) ? Option.None<U>() : noneFn()
-                            , TaskContinuationOptions.OnlyOnRanToCompletion);
+        public static async Task<Option<U>> BimapAsync<T, U>(this Task<Option<T>> optionTask, Func<Option<T>, Option<U>> someFn, Func<Option<U>> noneFn)
+        {
+            var option = await optionTask;
+            return option.IsSome
+                ? someFn?.Invoke(option) ?? Option.None<U>()
+                : noneFn?.Invoke() ?? Option.None<U>();
+        }
 
         public static async Task<Option<U>> BimapAsync<T, U>(this Option<T> option, Func<T, Task<U>> someAsyncFn, Func<Task<U>> noneAsyncFn)
             => (option.IsSome && someAsyncFn != null) 
                 ? Option.From(await someAsyncFn(option.Value)) 
                 : ((noneAsyncFn == null) ? Option.None<U>() : Option.From(await noneAsyncFn()));
-        
 
         public static Task<Option<U>> BimapAsync<T, U>(this Option<T> option, Func<Option<T>, Task<Option<U>>> someAsyncFn, Func<Task<Option<U>>> noneAsyncFn)
             => (option.IsSome && someAsyncFn != null) 
@@ -391,19 +421,17 @@ namespace Principia.Monads
             return ((noneAsyncFn == null) ? Option.None<U>() : await noneAsyncFn());
         }
 
-        public static Task<Option<T>> CombineAdditiveAsync<T>(this Task<Option<T>> optionTask, Task<Option<T>> optionAddTask, Func<T, T, T> additiveFn)
-            => Task.WhenAll(optionTask, optionAddTask)
-                .ContinueWith(
-                    _ =>
-                    {
-                        if (optionAddTask.Result.IsNone)
-                            return optionTask.Result;
+        public static async Task<Option<T>> CombineAdditiveAsync<T>(this Task<Option<T>> optionTask, Task<Option<T>> optionAddTask, Func<T, T, T> additiveFn)
+        {
+            await Task.WhenAll(optionTask, optionAddTask);
+            if (optionAddTask.Result.IsNone)
+                return optionTask.Result;
 
-                        if (optionTask.Result.IsNone)
-                            return optionAddTask.Result;
+            if (optionTask.Result.IsNone)
+                return optionAddTask.Result;
 
-                        return Option.From(additiveFn(optionTask.Result.Value, optionAddTask.Result.Value));
-                    }, TaskContinuationOptions.OnlyOnRanToCompletion );
+            return Option.From(additiveFn(optionTask.Result.Value, optionAddTask.Result.Value));
+        }
 
         public static async Task<Option<T>> CombineAdditiveAsync<T>(this Option<T> option, Option<T> optionAdd, Func<T, T, Task<T>> additiveAsyncFn)
         {
@@ -428,16 +456,14 @@ namespace Principia.Monads
             return Option.From(await additiveAsyncFn(optionTask.Result.Value, optionAddTask.Result.Value));
         }
 
-        public static Task<Option<T>> CombineMultiplicativeAsync<T>(this Task<Option<T>> optionTask, Task<Option<T>> optionAddTask, Func<T, T, T> multiplicativeFn)
-        => Task.WhenAll(optionTask, optionAddTask)
-                .ContinueWith(
-                    _ =>
-                    {
-                        if (optionAddTask.Result.IsNone || optionTask.Result.IsNone)
-                            return Option.None<T>();
+        public static async Task<Option<T>> CombineMultiplicativeAsync<T>(this Task<Option<T>> optionTask, Task<Option<T>> optionAddTask, Func<T, T, T> multiplicativeFn)
+        {
+            await Task.WhenAll(optionTask, optionAddTask);
+            if (optionAddTask.Result.IsNone || optionTask.Result.IsNone)
+                return Option.None<T>();
 
-                        return Option.From(multiplicativeFn(optionTask.Result.Value, optionAddTask.Result.Value));
-                    }, TaskContinuationOptions.OnlyOnRanToCompletion);
+            return Option.From(multiplicativeFn(optionTask.Result.Value, optionAddTask.Result.Value));
+        }
 
         public static async Task<Option<T>> CombineMultiplicativeAsync<T>(this Option<T> option, Option<T> optionAdd, Func<T, T, Task<T>> multiplicativeAsyncFn)
         {

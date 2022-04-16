@@ -40,7 +40,7 @@ namespace Principia.Monads
         {
             try
             {
-                return FromOr<TOk, TFail>(tryFn());
+                return FromOr<TOk, TFail>(tryFn(), result.FailValue);
             }
             catch
             {

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <Authors>Gordon Mangion</Authors>
     <Company />
     <Description>Initial Version of Principia.Monads at the moment containing only the definition of the OptionType (aka Maybe Monad) and ResultType (aka Either Monad)</Description>
@@ -11,6 +11,8 @@
     <PackageTags>Monad, Result, ResultType, Either, Option, OptionType, Optional. Maybe</PackageTags>
     <PackageReleaseNotes>Initial Version</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
   </PropertyGroup>
 
 </Project>

@@ -18,10 +18,10 @@ namespace Principia.Test.Monads.Monad
         }
 
         [Test]
-        public void MonadCreationFailTest()
+        public void MonadCreationNullTest()
         {
-            Assert.Throws<ArgumentNullException>(() => Option.Pure<string>(null));
-            Assert.Throws<ArgumentNullException>(() => Result.Pure<string, int>(null));
+            Assert.Throws<InvalidOperationException>(() => _ = Option.Pure<string>(null).Value);
+            Assert.Throws<InvalidOperationException>(() => _ = Result.Pure<string, int>(null).Value);
         }
 
         [Test]

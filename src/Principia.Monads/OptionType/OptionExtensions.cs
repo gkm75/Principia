@@ -25,6 +25,9 @@ namespace Principia.Monads
         public static Option<U> Map<T, U>(this Option<T> option, Func<T, U> mapFn)
             => option.IsSome ? Option.From(mapFn(option.Value)) : Option.None<U>();
 
+        public static Option<U> SwitchMap<T, U>(this Option<T> option, Func<U> mapFn)
+            => option.IsNone ? Option.From(mapFn()) : Option.None<U>();
+
         public static Option<U> Applicative<T, U>(this Option<T> option, Option<Func<T, U>> optionMapFn)
             => option.IsSome && optionMapFn.IsSome ? Option.From(optionMapFn.Value(option.Value)) : Option.None<U>();
 

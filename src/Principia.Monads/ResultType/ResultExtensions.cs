@@ -105,7 +105,7 @@ namespace Principia.Monads.ResultType
             => (result.IsOk) ? ok : fail;
 
         public static Result<TOk, TFail> OnOk<TOk, TFail>(this Result<TOk, TFail> result, Func<TOk> okFn)
-            => (result.IsOk && okFn != null) ? Result.From(okFn()) : result;
+            => (result.IsOk && okFn != null) ? Result.From<TOk, TFail>(okFn()) : result;
 
         public static Result<TOk, TFail> OnOk<TOk, TFail>(this Result<TOk, TFail> result, Func<Result<TOk, TFail>> okFn)
             => (result.IsOk && okFn != null) ? okFn() : result;
@@ -157,7 +157,7 @@ namespace Principia.Monads.ResultType
         {
             try
             {
-                return Result.FromOr<TOk, TFail>(tryFn(result.Value));
+                return Result.FromOr<TOk, TFail>(tryFn(result.Value), fail);
             }
             catch
             {
