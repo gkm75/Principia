@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Principia.CSharp.FnX;
+using Principia.CSharp.FnX.Functions;
 using Principia.CSharp.FnX.Monads;
 // using Principia.Monads;
 
@@ -56,15 +58,18 @@ namespace Principia.Trials
 
             var c = fn(5);
             var (h, v) = c;
-            
+
+            var d =c.Match( h => h + 1, () => 2);
+
+            var x = c.Map(async (int dd) => await Task.FromResult(dd)).Map( async j => (await j) + 1);
+                
         }
         
         private static void ResultMonadTrial()
         {
             Result<int, bool> r = Result.Ok<int, bool>(1);
 
-            Action a = OptionMonadTrial;
-            a.ToFunc();
+            var (h, _, _) = r;
             
         }
 
@@ -76,6 +81,7 @@ namespace Principia.Trials
 
 
             IdentityMonadTrial();
+            ResultMonadTrial();
         }
     }
 }

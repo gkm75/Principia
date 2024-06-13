@@ -38,7 +38,7 @@ public readonly struct Result<TOk, TFail> : IResult<TOk, TFail>, IEquatable<Resu
         }
         else
         {
-            _valueFail = valueFail ?? throw new InvalidOperationException("Fail value is null");
+            _valueFail = valueFail;
             _valueOk = default;
         }
     }

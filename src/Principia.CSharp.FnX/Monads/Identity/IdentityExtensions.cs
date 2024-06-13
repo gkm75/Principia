@@ -20,4 +20,8 @@ public static class IdentityExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Identity<T> WhereNot<T>(this Identity<T> identity, Func<T, bool> predicate)
         => identity.HasValue && predicate(identity.Reduce) ? Identity.EMPTY : identity;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Identity<T> Join<T>(this Identity<Identity<T>> identity)
+        => identity.HasValue ? identity.Reduce : Identity.EMPTY;
 }

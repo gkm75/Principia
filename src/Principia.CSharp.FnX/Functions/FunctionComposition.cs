@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace Principia.CSharp.FnX;
+namespace Principia.CSharp.FnX.Functions;
 
 public static partial class Function
 {

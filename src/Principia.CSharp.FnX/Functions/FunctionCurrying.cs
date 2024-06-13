@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Principia.CSharp.FnX;
+namespace Principia.CSharp.FnX.Functions;
 
 public static partial class Function
 {
