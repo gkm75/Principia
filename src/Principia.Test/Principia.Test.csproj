@@ -16,8 +16,4 @@
     <ProjectReference Include="..\Principia.Monads\Principia.Monads.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
-
 </Project>

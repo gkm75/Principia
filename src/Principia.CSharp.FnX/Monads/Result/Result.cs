@@ -103,6 +103,14 @@ public readonly struct Result
         => new (false, default, value);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Result<TOk, IFailure> Ok<TOk>(TOk value)
+        => new (true, value, default);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Result<TOk, IFailure> Fail<TOk>(IFailure value)
+        => new (false, default, value);
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, TFail> From<TOk, TFail>(TOk valueOk, TFail valueFail)
         => valueOk == null ? new (false, default, valueFail) : new (true, valueOk, default);
     

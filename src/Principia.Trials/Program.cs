@@ -70,7 +70,9 @@ namespace Principia.Trials
             Result<int, bool> r = Result.Ok<int, bool>(1);
 
             var (h, _, _) = r;
-            
+
+            var x = Result.Ok(1);
+            var y = Result.Fail<int>(null);
         }
 
         static void Main(string[] args)

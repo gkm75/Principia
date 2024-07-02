@@ -14,12 +14,8 @@ public static class IdentityExtensions
         => identity.HasValue ? bindFn(identity.Reduce) : Identity.EMPTY;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Identity<T> Where<T>(this Identity<T> identity, Func<T, bool> predicate)
+    public static Identity<T> Filter<T>(this Identity<T> identity, Func<T, bool> predicate)
         => identity.HasValue && predicate(identity.Reduce) ? identity : Identity.EMPTY;
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Identity<T> WhereNot<T>(this Identity<T> identity, Func<T, bool> predicate)
-        => identity.HasValue && predicate(identity.Reduce) ? Identity.EMPTY : identity;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Identity<T> Join<T>(this Identity<Identity<T>> identity)

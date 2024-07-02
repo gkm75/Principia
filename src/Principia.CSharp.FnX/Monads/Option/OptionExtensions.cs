@@ -46,13 +46,13 @@ public static class OptionExtensions
         => option.IsSome ? option.Reduce : Option.None<T>();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Option<T> Where<T>(this Option<T> option, Func<T, bool> predicate)
+    public static Option<T> Filter<T>(this Option<T> option, Func<T, bool> predicate)
         => option.IsSome && predicate(option.Reduce) ? option : Option.None<T>();
-
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Option<T> WhereNot<T>(this Option<T> option, Func<T, bool> predicate)
-        => option.IsSome && predicate(option.Reduce) ? Option.None<T>() : option;
-
+    public static Option<T> Filter<T>(this Option<T> option, Func<Option<T>, bool> predicate)
+        => option.IsSome && predicate(option) ? option : Option.None<T>();
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<T> WhenSome<T>(this Option<T> option, Action<T> action)
     {

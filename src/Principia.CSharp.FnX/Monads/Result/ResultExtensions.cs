@@ -52,20 +52,12 @@ public static class ResultExtensions
         => result.IsOk ? result.Reduce : Result.Fail<TOk, TFail>(result.ReduceFail);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Result<TOk, TFail> Where<TOk, TFail>(this Result<TOk, TFail> result, Func<TOk, bool> predicate)
+    public static Result<TOk, TFail> Filter<TOk, TFail>(this Result<TOk, TFail> result, Func<TOk, bool> predicate)
         => result.IsOk && predicate(result.Reduce) 
             ? result 
             : result.IsFail 
                 ? result 
                 : Result.Fail<TOk,TFail>(default);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Result<TOk, TFail> WhereNot<TOk, TFail>(this Result<TOk, TFail> result, Func<TOk, bool> predicate)
-        => result.IsOk && predicate(result.Reduce)
-            ? result.IsFail
-                ? result
-                : Result.Fail<TOk, TFail>(default)
-            : result;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, TFail> WhenOk<TOk, TFail>(this Result<TOk, TFail> result, Action<TOk> action)
