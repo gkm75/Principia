@@ -1,4 +1,7 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Principia.CSharp.FnX.Monads;
@@ -16,6 +19,10 @@ public static class OptionExtensions
         hasValue = option.HasValue;
         value = option.ReduceOr(default(T));
     }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<T> ToEnumerable<T>(this Option<T> option)
+        => option.IsSome ? new []{ option.Reduce } : Enumerable.Empty<T>();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<U> Map<T, U>(this Option<T> option, Func<T, U> mapFn)

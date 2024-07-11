@@ -42,8 +42,8 @@ namespace Principia.Trials
             var idN = Identity.From(n);
 
             var m = idN.Reduce;
-            var idGt = idN.Where(x => x > 0);
-
+            var idGt = idN.Filter(x => x > 0);
+            
             if (idN == idGt)
             {
                 Console.WriteLine("Monads are Equal!");
@@ -72,7 +72,9 @@ namespace Principia.Trials
             var (h, _, _) = r;
 
             var x = Result.Ok(1);
-            var y = Result.Fail<int>(null);
+            var y = ((int?)null).ToResult("bla");
+
+            var xx = 1.Pipe(x => x + 1);
         }
 
         static void Main(string[] args)

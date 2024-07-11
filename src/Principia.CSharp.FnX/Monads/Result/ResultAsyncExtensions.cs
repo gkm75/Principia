@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -6,6 +8,13 @@ namespace Principia.CSharp.FnX.Monads;
 
 public static class ResultAsyncExtensions
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static async Task<IEnumerable<TOk>> ToEnumerableAsync<TOk, TFail>(this ValueTask<Result<TOk, TFail>> resultTask)
+    {
+        var result = await resultTask;
+        return result.IsOk ? new[] {result.Reduce} : Enumerable.Empty<TOk>();
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Result<TNewOk, TFail>> MapAsync<TOk, TNewOk, TFail>(this ValueTask<Result<TOk, TFail>> resultTask, Func<TOk, TNewOk> mapFn)
     {

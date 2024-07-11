@@ -4,11 +4,17 @@ using System.Runtime.InteropServices;
 
 namespace Principia.CSharp.FnX.Monads;
 
+/// <summary>
+/// The Identity monad which merely wraps an object. Not a very useful class but it's here for completeness.
+/// </summary>
+/// <typeparam name="T">Type of the wrapped object</typeparam>
 [Serializable]
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct Identity<T> : IMonad<T>, IEquatable<Identity<T>>, IEquatable<IMonad<T>>
 {
     internal static Identity<T> Empty = new (false, default);
+    
+    /// <inheritdoc />
     public bool HasValue { get; }
     private readonly T _value;
     
@@ -65,10 +71,23 @@ public readonly struct Identity<T> : IMonad<T>, IEquatable<Identity<T>>, IEquata
     public static implicit operator Identity<T>(Identity<Unit> _) => Empty;
 }
 
+/// <summary>
+/// Identity structure mainly containing the factory method
+/// </summary>
 public readonly struct Identity
 {
+    /// <summary>
+    /// Generic property representing an Empty Identity monad
+    /// </summary>
     public static Identity<Unit> EMPTY => Identity<Unit>.Empty;
     
+    /// <summary>
+    /// Accepts an object instance and wraps it in an Identity monad. If the instance is null then the empty
+    /// Identity is returned
+    /// </summary>
+    /// <param name="value">Instance to be wrapped</param>
+    /// <typeparam name="T">Type of the object</typeparam>
+    /// <returns>An Identity instance</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Identity<T> From<T>(T value) => Identity<T>.From(value);
 }

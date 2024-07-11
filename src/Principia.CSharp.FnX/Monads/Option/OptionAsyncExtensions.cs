@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -6,6 +8,13 @@ namespace Principia.CSharp.FnX.Monads;
 
 public static class OptionAsyncExtensions
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static async ValueTask<IEnumerable<T>> ToEnumerableAsync<T>(this ValueTask<Option<T>> optionTask)
+    {
+        var option = await optionTask;
+        return option.IsSome ? new[] {option.Reduce} : Enumerable.Empty<T>();
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Option<U>> MapAsync<T, U>(this ValueTask<Option<T>> optionTask, Func<T, ValueTask<U>> mapFnAsync)
     {
@@ -17,8 +26,6 @@ public static class OptionAsyncExtensions
     public static async ValueTask<Option<U>> MapAsync<T, U>(this Option<T> option, Func<T, ValueTask<U>> mapFnAsync)
         => option.IsSome ? Option.From(await mapFnAsync(option.Reduce)) : Option.None<U>();
     
-
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Option<U>> MapAsync<T, U>(this ValueTask<Option<T>> optionTask, Func<T, U> mapFn)
     {

@@ -1,10 +1,16 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Principia.CSharp.FnX.Monads;
 
 public static class IdentityExtensions
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<T> ToEnumerable<T>(this Identity<T> identity)
+        => identity.HasValue ? new []{ identity.Reduce } : Enumerable.Empty<T>();
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Identity<U> Map<T, U>(this Identity<T> identity, Func<T, U> mapFn)
         =>  Identity<U>.From(identity.HasValue ? mapFn(identity.Reduce) : default);

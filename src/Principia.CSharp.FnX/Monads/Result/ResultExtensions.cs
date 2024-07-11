@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Principia.CSharp.FnX.Monads;
@@ -18,6 +20,10 @@ public static class ResultExtensions
         ok = result.ReduceOr(default(TOk));
         fail = result.ReduceFailOr(default(TFail));
     }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<TOk> ToEnumerable<TOk, TFail>(this Result<TOk, TFail> result)
+        => result.IsOk ? new []{ result.Reduce } : Enumerable.Empty<TOk>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TNewOk, TFail> Map<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<TOk, TNewOk> mapFn)
