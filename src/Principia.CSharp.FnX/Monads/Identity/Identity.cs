@@ -43,21 +43,29 @@ public readonly struct Identity<T> : IMonad<T>, IEquatable<Identity<T>>, IEquata
     public IMonad<U> Bind<U>(Func<T, IMonad<U>> bindFn)
         => HasValue ? bindFn(Reduce) : Identity<U>.From(default);
 
+    /// <summary>
+    /// ToString overload returning the string representation of the Identity instance
+    /// </summary>
+    /// <returns>string</returns>
     public override string ToString() => $"|{_value}|";
 
+    /// <inheritdoc />
     public bool Equals(Identity<T> other) 
         => HasValue && other.HasValue && Nullable.Equals(_value, other._value);
 
+    /// <inheritdoc />
     public override bool Equals(object obj) 
         => obj is Identity<T> other && Equals(other);
     
+    /// <inheritdoc />
     public bool Equals(IMonad<T> obj) 
         => obj is Identity<T> other && Equals(other);
 
+    /// <inheritdoc />
     public override int GetHashCode() => HasValue ? _value.GetHashCode() : 0;
-
+    
     public static bool operator ==(Identity<T> left, Identity<T> right) => left.Equals(right);
-
+    
     public static bool operator !=(Identity<T> left, Identity<T> right) => !left.Equals(right);
     
     public static bool operator ==(Identity<T> left, IMonad<T> right) => left.Equals(right);
@@ -68,6 +76,11 @@ public readonly struct Identity<T> : IMonad<T>, IEquatable<Identity<T>>, IEquata
 
     public static bool operator !=(IMonad<T> left, Identity<T> right) => !right.Equals(left);
     
+    /// <summary>
+    /// Implicit cast to turn an Identity of Unit instance into Empty
+    /// </summary>
+    /// <param name="_">Identity of Unit instance</param>
+    /// <returns>Empty Identity instance</returns>
     public static implicit operator Identity<T>(Identity<Unit> _) => Empty;
 }
 
