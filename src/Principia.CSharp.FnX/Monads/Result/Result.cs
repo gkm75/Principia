@@ -4,25 +4,61 @@ using System.Runtime.InteropServices;
 
 namespace Principia.CSharp.FnX.Monads;
 
+/// <summary>
+/// Base interface for all Result type monads
+/// </summary>
 public interface IResult : IMonad
 {
+    /// <summary>
+    /// Property to indicate if the result type is an Ok
+    /// </summary>
     bool IsOk { get; }
+    
+    /// <summary>
+    /// Property to indicate if the result type is a Fail
+    /// </summary>
     bool IsFail { get; }
 }
 
+/// <summary>
+/// Base interface for generic type result
+/// </summary>
+/// <typeparam name="TOk">Type of the Ok values</typeparam>
+/// <typeparam name="TFail">Type of the Fail values</typeparam>
 public interface IResult<TOk, TFail> : IMonad<TOk>, IResult
 {
+    /// <summary>
+    /// Returns the fail value of the Result. If the internal state is Ok, this will throw an exception
+    /// </summary>
     TFail ReduceFail { get; }
+    
+    /// <summary>
+    /// Returns the fail value of the Result, or an alternative supplied value
+    /// </summary>
     TFail ReduceFailOr(TFail orValue);
+    
+    /// <summary>
+    /// Returns the fail value of the Result, or an alternative value returned by the supplied function called lazily
+    /// </summary>
     TFail ReduceFailOr(Func<TFail> orValueFn);
 }
 
+/// <summary>
+/// Main result type implementation
+/// </summary>
+/// <typeparam name="TOk"></typeparam>
+/// <typeparam name="TFail"></typeparam>
 [Serializable]
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct Result<TOk, TFail> : IResult<TOk, TFail>, IEquatable<Result<TOk, TFail>>, IEquatable<IMonad<TOk>>
 {
+    /// <inheritdoc />
     public bool HasValue { get; }
+
+    /// <inheritdoc />
     public bool IsOk => HasValue;
+
+    /// <inheritdoc />
     public bool IsFail => !HasValue;
     
     private readonly TOk _valueOk;
@@ -43,37 +79,48 @@ public readonly struct Result<TOk, TFail> : IResult<TOk, TFail>, IEquatable<Resu
         }
     }
 
+    /// <inheritdoc />
     public TOk Reduce => _valueOk;
 
+    /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TOk ReduceOr(TOk orValue) => HasValue ? _valueOk : orValue;
 
+    /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TOk ReduceOr(Func<TOk> orValueFn) => HasValue ? _valueOk : orValueFn();
-    
+
+    /// <inheritdoc />
     public TFail ReduceFail => _valueFail;
-    
+
+    /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TFail ReduceFailOr(TFail orValue) => IsFail ? _valueFail : orValue;
 
+    /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TFail ReduceFailOr(Func<TFail> orValueFn) => IsFail ? _valueFail : orValueFn();
-    
+
+    /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IMonad<U> Bind<U>(Func<TOk, IMonad<U>> bindFn) => HasValue ? bindFn(_valueOk) : new Result<U, TFail>(false, default, default);
 
+    /// <inheritdoc />
     public bool Equals(Result<TOk, TFail> other)
         => HasValue == other.HasValue &&
            HasValue
             ? Nullable.Equals(_valueOk, other._valueOk)
             : Nullable.Equals(_valueFail, other._valueFail);
 
+    /// <inheritdoc />
     public override bool Equals(object obj) 
         => obj is Result<TOk, TFail> other && Equals(other);
 
+    /// <inheritdoc />
     public bool Equals(IMonad<TOk> monad) 
         => monad is Result<TOk, TFail> other && Equals(other);
 
+    /// <inheritdoc />
     public override int GetHashCode() 
         => HasValue 
             ? HashCode.Combine(HasValue, _valueOk) 
@@ -92,6 +139,9 @@ public readonly struct Result<TOk, TFail> : IResult<TOk, TFail>, IEquatable<Resu
     public static bool operator !=(IMonad<TOk> left, Result<TOk, TFail> right) => !right.Equals(left);
 }
 
+/// <summary>
+/// Result structure mainly for factory constructors
+/// </summary>
 public readonly struct Result
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
