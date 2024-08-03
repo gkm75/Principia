@@ -144,34 +144,89 @@ public readonly struct Result<TOk, TFail> : IResult<TOk, TFail>, IEquatable<Resu
 /// </summary>
 public readonly struct Result
 {
+    /// <summary>
+    /// Result Ok Constructor 
+    /// </summary>
+    /// <param name="value">The value to be wrapped</param>
+    /// <typeparam name="TOk">Type of the Ok value</typeparam>
+    /// <typeparam name="TFail">Type of the Fail value</typeparam>
+    /// <returns>Result monad wrapping the Ok value</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, TFail> Ok<TOk, TFail>(TOk value)
         => new (true, value, default);
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    /// <typeparam name="TOk"></typeparam>
+    /// <typeparam name="TFail"></typeparam>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, TFail> Fail<TOk, TFail>(TFail value)
         => new (false, default, value);
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    /// <typeparam name="TOk"></typeparam>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, IFailure> Ok<TOk>(TOk value)
         => new (true, value, default);
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    /// <typeparam name="TOk"></typeparam>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, IFailure> Fail<TOk>(IFailure value)
         => new (false, default, value);
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<Unit, IFailure> Fail(IFailure value)
         => new (false, Unit.Value, value);
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="valueOk"></param>
+    /// <param name="valueFail"></param>
+    /// <typeparam name="TOk"></typeparam>
+    /// <typeparam name="TFail"></typeparam>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, TFail> From<TOk, TFail>(TOk valueOk, TFail valueFail)
         => valueOk == null ? new (false, default, valueFail) : new (true, valueOk, default);
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="valueOk"></param>
+    /// <param name="valueFailFn"></param>
+    /// <typeparam name="TOk"></typeparam>
+    /// <typeparam name="TFail"></typeparam>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, TFail> From<TOk, TFail>(TOk valueOk, Func<TFail> valueFailFn)
         => valueOk == null ? new (false, default, valueFailFn()) : new (true, valueOk, default);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="valueOkFn"></param>
+    /// <param name="valueFailFn"></param>
+    /// <typeparam name="TOk"></typeparam>
+    /// <typeparam name="TFail"></typeparam>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, TFail> From<TOk, TFail>(Func<TOk> valueOkFn, Func<TFail> valueFailFn)
     {
@@ -179,6 +234,13 @@ public readonly struct Result
         return valueOk == null ? new(false, default, valueFailFn()) : new(true, valueOk, default);
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tryFn"></param>
+    /// <typeparam name="TReturn"></typeparam>
+    /// <typeparam name="TExn"></typeparam>
+    /// <returns></returns>
     public static Result<TReturn, TExn> Try<TReturn, TExn>(Func<TReturn> tryFn) where TExn : Exception
     {
         try
@@ -191,6 +253,15 @@ public readonly struct Result
         }
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tryFn"></param>
+    /// <param name="params"></param>
+    /// <typeparam name="TParam"></typeparam>
+    /// <typeparam name="TReturn"></typeparam>
+    /// <typeparam name="TExn"></typeparam>
+    /// <returns></returns>
     public static Result<TReturn, TExn> Try<TParam, TReturn, TExn>(Func<TParam[], TReturn> tryFn, params TParam[] @params) where TExn : Exception
     {
         try
@@ -203,6 +274,15 @@ public readonly struct Result
         }
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tryAction"></param>
+    /// <param name="params"></param>
+    /// <typeparam name="TParam"></typeparam>
+    /// <typeparam name="TReturn"></typeparam>
+    /// <typeparam name="TExn"></typeparam>
+    /// <returns></returns>
     public static Result<Unit, TExn> Try<TParam, TReturn, TExn>(Action<TParam[]> tryAction, params TParam[] @params) where TExn : Exception
     {
         try
