@@ -18,7 +18,7 @@ public static class IdentityExtensions
     /// <returns>IEnumerable of T</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<T> ToEnumerable<T>(this Identity<T> identity)
-        => identity.HasValue ? new []{ identity.Reduce } : Enumerable.Empty<T>();
+        => identity.HasValue ? new[]{ identity.Reduce } : Enumerable.Empty<T>();
     
     /// <summary>
     /// Transforms the Identity monad into another Identity wrapping a different type
@@ -30,7 +30,7 @@ public static class IdentityExtensions
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Identity<U> Map<T, U>(this Identity<T> identity, Func<T, U> mapFn)
-        =>  Identity<U>.From(identity.HasValue ? mapFn(identity.Reduce) : default);
+        =>  Identity<U>.From(mapFn(identity.Reduce));
  
     /// <summary>
     /// 
@@ -42,18 +42,8 @@ public static class IdentityExtensions
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Identity<U> Bind<T, U>(this Identity<T> identity, Func<T, Identity<U>> bindFn)
-        => identity.HasValue ? bindFn(identity.Reduce) : Identity.EMPTY;
+        => bindFn(identity.Reduce);
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="identity">The identity instance</param>
-    /// <param name="predicate"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Identity<T> Filter<T>(this Identity<T> identity, Func<T, bool> predicate)
-        => identity.HasValue && predicate(identity.Reduce) ? identity : Identity.EMPTY;
     
     /// <summary>
     /// Flattening operation, transforms (Identity of (Identity of T)) into an Identity of T
@@ -63,5 +53,12 @@ public static class IdentityExtensions
     /// <returns>The flattened Identity</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Identity<T> Join<T>(this Identity<Identity<T>> identity)
-        => identity.HasValue ? identity.Reduce : Identity.EMPTY;
+        => identity.Reduce;
+    
+    public static Identity<U> Apply<T, U>(this Identity<T> identity, Identity<Func<T, U>> fn)
+        => Identity.From(fn.Reduce(identity.Reduce));
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Identity<V> Combine<T, U, V>(this Identity<T> identity, Identity<U> identity2, Func<T, U, V> combineFn)
+        => Identity.From(combineFn(identity.Reduce, identity2.Reduce));
 }

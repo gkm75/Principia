@@ -5,7 +5,6 @@ namespace Principia.CSharp.FnX;
 /// <summary>
 /// A representation of "no value", similar to the C# void
 /// </summary>
-[Serializable]
 public readonly struct Unit : IEquatable<Unit>
 {
     /// <summary>

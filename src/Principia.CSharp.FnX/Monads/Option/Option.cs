@@ -67,10 +67,6 @@ public readonly struct Option<T> : IOption<T>, IEquatable<Option<T>>, IEquatable
     public T ReduceOr(Func<T> orValueFn) => HasValue ? _value : orValueFn();
 
     /// <inheritdoc />
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IMonad<U> Bind<U>(Func<T, IMonad<U>> bindFn) => HasValue ? bindFn(_value) : Option<U>.None;
-
-    /// <inheritdoc />
     public override string ToString()
         => IsSome ? $"Some {_value}" : $"None<{typeof(T).Name}>";
 

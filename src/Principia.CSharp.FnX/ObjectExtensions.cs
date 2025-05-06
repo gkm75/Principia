@@ -30,6 +30,11 @@ public static class ObjectExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static T DeepClone<T>(this T obj)
     {
+        if (ReferenceEquals(obj, null))
+        {
+            return default;
+        }
+        
         var serialized = JsonSerializer.Serialize(obj);
         return JsonSerializer.Deserialize<T>(serialized);
     }

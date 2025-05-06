@@ -10,7 +10,6 @@ namespace Principia.CSharp.FnX.Monads;
 /// </summary>
 public static class ResultExtensions
 {
-    
     public static void Deconstruct<TOk, TFail>(this IResult<TOk, TFail> result, out bool hasValue, out TOk ok, out TFail fail)
     {
         hasValue = result.HasValue;

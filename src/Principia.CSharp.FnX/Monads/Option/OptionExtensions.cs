@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -43,7 +42,7 @@ public static class OptionExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<U> Bind<T, U>(this Option<T> option, Func<Option<T>, Option<U>> bindFn)
         => option.IsSome ? bindFn(option) : Option.None<U>();
-
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<T> BindNone<T>(this Option<T> option, Func<Option<T>> bindFn)
         => option.IsNone ? bindFn() : option;

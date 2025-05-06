@@ -100,10 +100,12 @@ public readonly struct Result<TOk, TFail> : IResult<TOk, TFail>, IEquatable<Resu
     /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TFail ReduceFailOr(Func<TFail> orValueFn) => IsFail ? _valueFail : orValueFn();
-
+    
     /// <inheritdoc />
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IMonad<U> Bind<U>(Func<TOk, IMonad<U>> bindFn) => HasValue ? bindFn(_valueOk) : new Result<U, TFail>(false, default, default);
+    public override string ToString()
+        => HasValue
+            ? $"Ok({_valueOk.ToString()})"
+            : $"Fail({_valueFail.ToString()})";
 
     /// <inheritdoc />
     public bool Equals(Result<TOk, TFail> other)

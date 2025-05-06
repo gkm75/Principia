@@ -12,37 +12,26 @@ namespace Principia.CSharp.FnX.Monads;
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct Identity<T> : IMonad<T>, IEquatable<Identity<T>>, IEquatable<IMonad<T>>
 {
-    internal static Identity<T> Empty = new (false, default);
-    
     /// <inheritdoc />
-    public bool HasValue { get; }
+    public bool HasValue => true;
     private readonly T _value;
     
-    private Identity(bool hasValue, T value)
+    private Identity(T value)
     {
-        HasValue = hasValue;
-        _value = hasValue ? value : default;
+        _value = value ?? throw new InvalidOperationException("Identity has no value");
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Identity<T> From(T value) => new (value != null, value);
+    public static Identity<T> From(T value) => new (value);
     
-    
-    public T Reduce 
-        => HasValue ? _value : throw new InvalidOperationException("Identity has no value");
+    public T Reduce => _value;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T ReduceOr(T orValue)
-        => HasValue ? _value : orValue;
+    public T ReduceOr(T _) => _value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T ReduceOr(Func<T> orValueFn)
-        => HasValue ? _value : orValueFn();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IMonad<U> Bind<U>(Func<T, IMonad<U>> bindFn)
-        => HasValue ? bindFn(Reduce) : Identity<U>.From(default);
-
+    public T ReduceOr(Func<T> orValueFn) => _value;
+    
     /// <summary>
     /// ToString overload returning the string representation of the Identity instance
     /// </summary>
@@ -62,7 +51,7 @@ public readonly struct Identity<T> : IMonad<T>, IEquatable<Identity<T>>, IEquata
         => obj is Identity<T> other && Equals(other);
 
     /// <inheritdoc />
-    public override int GetHashCode() => HasValue ? _value.GetHashCode() : 0;
+    public override int GetHashCode() => _value.GetHashCode();
     
     public static bool operator ==(Identity<T> left, Identity<T> right) => left.Equals(right);
     
@@ -75,13 +64,6 @@ public readonly struct Identity<T> : IMonad<T>, IEquatable<Identity<T>>, IEquata
     public static bool operator ==(IMonad<T> left, Identity<T> right) => right.Equals(left);
 
     public static bool operator !=(IMonad<T> left, Identity<T> right) => !right.Equals(left);
-    
-    /// <summary>
-    /// Implicit cast to turn an Identity of Unit instance into Empty
-    /// </summary>
-    /// <param name="_">Identity of Unit instance</param>
-    /// <returns>Empty Identity instance</returns>
-    public static implicit operator Identity<T>(Identity<Unit> _) => Empty;
 }
 
 /// <summary>
@@ -89,11 +71,6 @@ public readonly struct Identity<T> : IMonad<T>, IEquatable<Identity<T>>, IEquata
 /// </summary>
 public readonly struct Identity
 {
-    /// <summary>
-    /// Generic property representing an Empty Identity monad
-    /// </summary>
-    public static Identity<Unit> EMPTY => Identity<Unit>.Empty;
-    
     /// <summary>
     /// Accepts an object instance and wraps it in an Identity monad. If the instance is null then the empty
     /// Identity is returned

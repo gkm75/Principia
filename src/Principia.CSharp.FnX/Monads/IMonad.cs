@@ -37,14 +37,5 @@ public interface IMonad<T> : IMonad
     /// <param name="orValueFn">The function which supplies an alternative orValue</param>
     /// <returns>An instance of type T</returns>
     T ReduceOr(Func<T> orValueFn);
-    
-    /// <summary>
-    /// The Bind operation which transforms the current monad(T) into another monad(U), provided the source monad
-    /// contains a value.
-    /// </summary>
-    /// <param name="bindFn">The transforming function</param>
-    /// <typeparam name="U">The target instance type</typeparam>
-    /// <returns>A new monad possibly wrapping a type U instance</returns>
-    IMonad<U> Bind<U>(Func<T, IMonad<U>> bindFn);
 }
 

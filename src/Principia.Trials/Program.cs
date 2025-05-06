@@ -42,9 +42,9 @@ namespace Principia.Trials
             var idN = Identity.From(n);
 
             var m = idN.Reduce;
-            var idGt = idN.Filter(x => x > 0);
+            var idMap = idN.Map(x => x * 1);
             
-            if (idN == idGt)
+            if (idN == idMap)
             {
                 Console.WriteLine("Monads are Equal!");
             }

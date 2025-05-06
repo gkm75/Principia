@@ -49,7 +49,7 @@ public static partial class Function
         => (T param) => rightFn(leftFn(param));
 
     /// <summary>
-    /// Composition of two functions, not in the mathematical sense, the output of one function is passed as input
+    /// Composition of two functions, in the mathematical sense, the output of one function is passed as input
     /// to the next function
     /// </summary>
     /// <param name="leftFn"></param>
@@ -62,7 +62,7 @@ public static partial class Function
         => () => leftFn(rightFn());
 
     /// <summary>
-    /// Composition of two functions, not in the mathematical sense, the output of one function is passed as input
+    /// Composition of two functions, in the mathematical sense, the output of one function is passed as input
     /// to the next function
     /// </summary>
     /// <param name="leftFn"></param>

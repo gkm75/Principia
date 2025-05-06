@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Principia.CSharp.FnX.Functions;
 
@@ -13,6 +15,7 @@ public static class Standard
     /// <param name="value">The passed value</param>
     /// <typeparam name="T">Type of the value</typeparam>
     /// <returns>The passed value/object instance back</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static T Id<T>(T value) => value;
     
     /// <summary>
@@ -172,31 +175,15 @@ public static class Standard
     /// <param name="n"></param>
     /// <returns>True if n is even</returns>
     public static bool IsEven(ulong n) => (n & 1) == 0;
-
-    /// <summary>
-    /// An equality function to test if a float number is equal to another within an epsilon range
-    /// </summary>
-    /// <param name="f1"></param>
-    /// <param name="f2"></param>
-    /// <param name="epsilon"></param>
-    /// <returns></returns>
-    public static bool EpsilonEquals(float f1, float f2, float epsilon) => f2 >= (f1 - epsilon) && f2 <= (f1 + epsilon);
     
     /// <summary>
-    /// An equality function to test if a float number is equal to another within an epsilon range
+    /// An equality function to test if a number is equal to another within an epsilon range
     /// </summary>
-    /// <param name="f1"></param>
-    /// <param name="f2"></param>
-    /// <param name="epsilon"></param>
-    /// <returns></returns>
-    public static bool EpsilonEquals(double f1, double f2, double epsilon) => f2 >= (f1 - epsilon) && f2 <= (f1 + epsilon);
-    
-    /// <summary>
-    /// An equality function to test if a float number is equal to another within an epsilon range
-    /// </summary>
-    /// <param name="f1"></param>
-    /// <param name="f2"></param>
-    /// <param name="epsilon"></param>
-    /// <returns></returns>
-    public static bool EpsilonEquals(decimal f1, decimal f2, decimal epsilon) => f2 >= (f1 - epsilon) && f2 <= (f1 + epsilon);
+    /// <param name="v1">The first value to compare</param>
+    /// <param name="v2">The second value to compare</param>
+    /// <param name="epsilon">The interval of the range</param>
+    /// <returns>True if the values are equal within the range</returns>
+    public static bool EpsilonEquals<T>(T v1, T v2, T epsilon) 
+            where T : ISubtractionOperators<T, T, T>, IAdditionOperators<T, T, T>, IComparisonOperators<T, T, bool>
+        => v2 >= (v1 - epsilon) && v2 <= (v1 + epsilon);
 }
