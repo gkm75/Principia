@@ -186,4 +186,49 @@ public static class Standard
     public static bool EpsilonEquals<T>(T v1, T v2, T epsilon) 
             where T : ISubtractionOperators<T, T, T>, IAdditionOperators<T, T, T>, IComparisonOperators<T, T, bool>
         => v2 >= (v1 - epsilon) && v2 <= (v1 + epsilon);
+
+
+    /// <summary>
+    /// Accepts a list of values and returns the first which is not null
+    /// </summary>
+    /// <param name="inputs"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static T Coalesce<T>(params T[] inputs)
+    {
+        foreach (var value in inputs)
+        {
+            if (value != null)
+            {
+                return value;
+            }
+        }
+
+        return default;
+    }
+    
+    /// <summary>
+    /// Accepts a list of functions and returns the first which value after execution is not null
+    /// </summary>
+    /// <param name="inputFns"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static T Coalesce<T>(params Func<T>[] inputFns)
+    {
+        foreach (var fn in inputFns)
+        {
+            if (fn == null)
+            {
+                continue;
+            }
+            
+            var value = fn();
+            if (value != null)
+            {
+                return value;
+            }
+        }
+
+        return default;
+    }
 }

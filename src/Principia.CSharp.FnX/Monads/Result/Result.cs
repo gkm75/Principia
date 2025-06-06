@@ -30,17 +30,17 @@ public interface IResult<TOk, TFail> : IMonad<TOk>, IResult
     /// <summary>
     /// Returns the fail value of the Result. If the internal state is Ok, this will throw an exception
     /// </summary>
-    TFail ReduceFail { get; }
+    TFail ValueFail { get; }
     
     /// <summary>
     /// Returns the fail value of the Result, or an alternative supplied value
     /// </summary>
-    TFail ReduceFailOr(TFail orValue);
+    TFail FailValueOr(TFail orValue);
     
     /// <summary>
     /// Returns the fail value of the Result, or an alternative value returned by the supplied function called lazily
     /// </summary>
-    TFail ReduceFailOr(Func<TFail> orValueFn);
+    TFail FailValueOr(Func<TFail> orValueFn);
 }
 
 /// <summary>
@@ -80,26 +80,47 @@ public readonly struct Result<TOk, TFail> : IResult<TOk, TFail>, IEquatable<Resu
     }
 
     /// <inheritdoc />
-    public TOk Reduce => _valueOk;
+    public TOk Value => _valueOk;
 
     /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public TOk ReduceOr(TOk orValue) => HasValue ? _valueOk : orValue;
+    public TOk ValueOr(TOk orValue) => HasValue ? _valueOk : orValue;
 
     /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public TOk ReduceOr(Func<TOk> orValueFn) => HasValue ? _valueOk : orValueFn();
-
-    /// <inheritdoc />
-    public TFail ReduceFail => _valueFail;
+    public TOk ValueOr(Func<TOk> orValueFn) => HasValue ? _valueOk : orValueFn();
 
     /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public TFail ReduceFailOr(TFail orValue) => IsFail ? _valueFail : orValue;
+    public IMonad<U> Bind<U>(Func<TOk, IMonad<U>> bindFn)
+        => HasValue ? bindFn(_valueOk) : Result.Fail<U, TFail>(default);
+
+    /// <inheritdoc />
+    public Identity<TOk> EnsureIdentity() 
+        => HasValue ? Identity<TOk>.From(Value) : Identity<TOk>.From(default);
+
+    /// <inheritdoc />
+    public Option<TOk> EnsureOption() 
+        => HasValue ? Option.Some(_valueOk) : Option<TOk>.None;
+
+    /// <inheritdoc />
+    public Result<TOk, T> EnsureResult<T>(T failValue)
+        => IsOk ? Result.Ok<TOk, T>(_valueOk) : Result.Fail<TOk, T>(failValue);
+
+    /// <inheritdoc />
+    public Result<TOk, T> EnsureResult<T>(Func<T> failFn)
+        => IsOk ? Result.Ok<TOk, T>(_valueOk) : Result.Fail<TOk, T>(failFn());
+
+    /// <inheritdoc />
+    public TFail ValueFail => _valueFail;
 
     /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public TFail ReduceFailOr(Func<TFail> orValueFn) => IsFail ? _valueFail : orValueFn();
+    public TFail FailValueOr(TFail orValue) => IsFail ? _valueFail : orValue;
+
+    /// <inheritdoc />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public TFail FailValueOr(Func<TFail> orValueFn) => IsFail ? _valueFail : orValueFn();
     
     /// <inheritdoc />
     public override string ToString()

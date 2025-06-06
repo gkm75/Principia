@@ -41,7 +41,7 @@ namespace Principia.Trials
             var n = 4;
             var idN = Identity.From(n);
 
-            var m = idN.Reduce;
+            var m = idN.Value;
             var idMap = idN.Map(x => x * 1);
             
             if (idN == idMap)
@@ -59,10 +59,13 @@ namespace Principia.Trials
             var c = fn(5);
             var (h, v) = c;
 
-            var d =c.Match( h => h + 1, () => 2);
-
+            var d =c.Map( h => h + 1) .MapNone( () => 2);
+            
             var x = c.Map(async (int dd) => await Task.FromResult(dd)).Map( async j => (await j) + 1);
-                
+
+            var opt = Option.Some(9);
+            var opt2 = opt.Bind(x => Option.Some(x.ToString()));
+
         }
         
         private static void ResultMonadTrial()

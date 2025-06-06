@@ -56,15 +56,30 @@ public readonly struct Option<T> : IOption<T>, IEquatable<Option<T>>, IEquatable
     }
 
     /// <inheritdoc />
-    public T Reduce => _value;
+    public T Value => _value;
 
     /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T ReduceOr(T orValue) => HasValue ? _value : orValue;
+    public T ValueOr(T orValue) => HasValue ? _value : orValue;
 
     /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T ReduceOr(Func<T> orValueFn) => HasValue ? _value : orValueFn();
+    public T ValueOr(Func<T> orValueFn) => HasValue ? _value : orValueFn();
+
+    /// <inheritdoc />
+    public Identity<T> EnsureIdentity()
+        => HasValue ? Identity<T>.From(Value) : Identity<T>.From(default);
+
+    /// <inheritdoc />
+    public Option<T> EnsureOption() => this;
+    
+    /// <inheritdoc />
+    public Result<T, TFail> EnsureResult<TFail>(TFail failValue)
+        => HasValue ? Result.Ok<T, TFail>(_value) : Result.Fail<T, TFail>(failValue);
+
+    /// <inheritdoc />
+    public Result<T, TFail> EnsureResult<TFail>(Func<TFail> failFn)
+        => HasValue ? Result.Ok<T, TFail>(_value) : Result.Fail<T, TFail>(failFn());
 
     /// <inheritdoc />
     public override string ToString()

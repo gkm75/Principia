@@ -18,7 +18,7 @@ public static class IdentityExtensions
     /// <returns>IEnumerable of T</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<T> ToEnumerable<T>(this Identity<T> identity)
-        => identity.HasValue ? new[]{ identity.Reduce } : Enumerable.Empty<T>();
+        => identity.HasValue ? new[]{ identity.Value } : Enumerable.Empty<T>();
     
     /// <summary>
     /// Transforms the Identity monad into another Identity wrapping a different type
@@ -30,7 +30,7 @@ public static class IdentityExtensions
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Identity<U> Map<T, U>(this Identity<T> identity, Func<T, U> mapFn)
-        =>  Identity<U>.From(mapFn(identity.Reduce));
+        =>  Identity<U>.From(mapFn(identity.Value));
  
     /// <summary>
     /// 
@@ -42,7 +42,7 @@ public static class IdentityExtensions
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Identity<U> Bind<T, U>(this Identity<T> identity, Func<T, Identity<U>> bindFn)
-        => bindFn(identity.Reduce);
+        => bindFn(identity.Value);
 
     
     /// <summary>
@@ -53,12 +53,30 @@ public static class IdentityExtensions
     /// <returns>The flattened Identity</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Identity<T> Join<T>(this Identity<Identity<T>> identity)
-        => identity.Reduce;
+        => identity.Value;
     
+    /// <summary>
+    /// Apply function accepts a wrapped function which called with the identity value as actual parameter 
+    /// </summary>
+    /// <param name="identity"></param>
+    /// <param name="fn"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="U"></typeparam>
+    /// <returns></returns>
     public static Identity<U> Apply<T, U>(this Identity<T> identity, Identity<Func<T, U>> fn)
-        => Identity.From(fn.Reduce(identity.Reduce));
+        => Identity.From(fn.Value(identity.Value));
     
+    /// <summary>
+    /// Combined two identity monads using the supplied function 
+    /// </summary>
+    /// <param name="identity"></param>
+    /// <param name="identity2"></param>
+    /// <param name="combineFn"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="U"></typeparam>
+    /// <typeparam name="V"></typeparam>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Identity<V> Combine<T, U, V>(this Identity<T> identity, Identity<U> identity2, Func<T, U, V> combineFn)
-        => Identity.From(combineFn(identity.Reduce, identity2.Reduce));
+        => Identity.From(combineFn(identity.Value, identity2.Value));
 }

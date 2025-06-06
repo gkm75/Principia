@@ -24,13 +24,29 @@ public readonly struct Identity<T> : IMonad<T>, IEquatable<Identity<T>>, IEquata
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Identity<T> From(T value) => new (value);
     
-    public T Reduce => _value;
+    public T Value => _value;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T ReduceOr(T _) => _value;
+    public T ValueOr(T _) => _value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T ReduceOr(Func<T> orValueFn) => _value;
+    public T ValueOr(Func<T> orValueFn) => _value;
+
+    /// <inheritdoc />
+    public Identity<T> EnsureIdentity() 
+        => this;
+
+    /// <inheritdoc />
+    public Option<T> EnsureOption() 
+        => HasValue ? Option.Some(_value) : Option<T>.None;
+    
+    /// <inheritdoc />
+    public Result<T, TFail> EnsureResult<TFail>(TFail failValue)
+        => HasValue ? Result.Ok<T, TFail>(_value) : Result.Fail<T, TFail>(failValue);
+
+    /// <inheritdoc />
+    public Result<T, TFail> EnsureResult<TFail>(Func<TFail> failFn)
+        => HasValue ? Result.Ok<T, TFail>(_value) : Result.Fail<T, TFail>(failFn());
     
     /// <summary>
     /// ToString overload returning the string representation of the Identity instance

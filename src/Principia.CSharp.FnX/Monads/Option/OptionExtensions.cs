@@ -5,43 +5,48 @@ using System.Runtime.CompilerServices;
 
 namespace Principia.CSharp.FnX.Monads;
 
+
 public static class OptionExtensions
 {
     public static void Deconstruct<T>(this IOption<T> option, out bool hasValue, out T value)
     {
         hasValue = option.HasValue;
-        value = option.ReduceOr(default(T));
+        value = option.ValueOr(default(T));
     }
 
     public static void Deconstruct<T>(this Option<T> option, out bool hasValue, out T value)
     {
         hasValue = option.HasValue;
-        value = option.ReduceOr(default(T));
+        value = option.ValueOr(default(T));
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<T> ToEnumerable<T>(this Option<T> option)
-        => option.IsSome ? new []{ option.Reduce } : Enumerable.Empty<T>();
+        => option.IsSome ? new []{ option.Value } : Enumerable.Empty<T>();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<U> Map<T, U>(this Option<T> option, Func<T, U> mapFn)
-        => option.IsSome ? Option.From(mapFn(option.Reduce)) : Option.None<U>();
+        => option.IsSome ? Option.From(mapFn(option.Value)) : Option.None<U>();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<U> Map<T, U>(this Option<T> option, Func<Option<T>, U> mapFn)
         => option.IsSome ? Option.From(mapFn(option)) : Option.None<U>();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Option<T> MapNone<T, U>(this Option<T> option, Func<T> mapFn)
+    public static Option<T> MapNone<T>(this Option<T> option, Func<T> mapFn)
         => option.IsNone ? Option.From(mapFn()) : option;
 
+    // /// <summary>
+    // /// Accepts a function which takes a T value and returns an Option &lt;U&gt;. The function is executed by
+    // /// passing the value contained inside and the new Option is returned. This can be used to chain monadic
+    // /// computations together.
+    // /// </summary>
+    // /// <param name="bindFn"></param>
+    // /// <typeparam name="U"></typeparam>
+    // /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<U> Bind<T, U>(this Option<T> option, Func<T, Option<U>> bindFn)
-        => option.IsSome ? bindFn(option.Reduce) : Option.None<U>();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Option<U> Bind<T, U>(this Option<T> option, Func<Option<T>, Option<U>> bindFn)
-        => option.IsSome ? bindFn(option) : Option.None<U>();
+        => option.IsSome ? bindFn(option.Value) : Option.None<U>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<T> BindNone<T>(this Option<T> option, Func<Option<T>> bindFn)
@@ -49,22 +54,33 @@ public static class OptionExtensions
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<T> Join<T>(this Option<Option<T>> option)
-        => option.IsSome ? option.Reduce : Option.None<T>();
+        => option.IsSome ? option.Value : Option.None<T>();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<T> Filter<T>(this Option<T> option, Func<T, bool> predicate)
-        => option.IsSome && predicate(option.Reduce) ? option : Option.None<T>();
+        => option.IsSome && predicate(option.Value) ? option : Option.None<T>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<T> Filter<T>(this Option<T> option, Func<Option<T>, bool> predicate)
         => option.IsSome && predicate(option) ? option : Option.None<T>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Option<T> WhenSome<T>(this Option<T> option, Action action)
+    {
+        if (option.IsSome)
+        {
+            action();
+        }
+
+        return option;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<T> WhenSome<T>(this Option<T> option, Action<T> action)
     {
         if (option.IsSome)
         {
-            action(option.Reduce);
+            action(option.Value);
         }
 
         return option;
@@ -112,78 +128,28 @@ public static class OptionExtensions
         => option.IsNone ? maybeFallback : option;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Option<T> Or<T>(this Option<T> option, Func<T> fallbackFn)
+        => option.IsNone ? Option.From(fallbackFn()) : option;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<T> Or<T>(this Option<T> option, Func<Option<T>> fallbackFn)
         => option.IsNone ? fallbackFn() : option;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Match<T>(this Option<T> option, Action<T> someAction, Action noneAction)
-    {
-        if (option.IsSome)
-        {
-            someAction(option.Reduce);
-        }
-        else
-        {
-            noneAction();
-        }
-    }
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Match<T>(this Option<T> option, Action<Option<T>> someAction, Action noneAction)
-    {
-        if (option.IsSome)
-        {
-            someAction(option);
-        }
-        else
-        {
-            noneAction();
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static U Match<T, U>(this Option<T> option, U some, U none)
-        => option.IsSome ? some : none;
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Option<U> Match<T, U>(this Option<T> option, Option<U> some, Option<U> none)
-        => option.IsSome ? some : none;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static U Match<T, U>(this Option<T> option, Func<U> someFn, Func<U> noneFn)
-        => option.IsSome ? someFn() : noneFn();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static U Match<T, U>(this Option<T> option, U some, Func<U> noneFn)
-        => option.IsSome ? some : noneFn();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static U Match<T, U>(this Option<T> option, Func<U> someFn, U none)
-        => option.IsSome ? someFn() : none;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static U Match<T, U>(this Option<T> option, Func<T, U> some, U none)
-        => option.IsSome ? option.Map(some).Reduce : none;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static U Match<T, U>(this Option<T> option, Func<T, U> some, Func<U> noneFn)
-        => option.IsSome ? option.Map(some).Reduce : noneFn();
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<U> Apply<T, U>(this Option<T> option, Option<Func<T, U>> optionFn)
-        => option.IsSome && optionFn.IsSome ? Option.Some(optionFn.Reduce(option.Reduce)) : Option.None<U>();
+        => option.IsSome && optionFn.IsSome ? Option.Some(optionFn.Value(option.Value)) : Option.None<U>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<U> Apply<T, U>(this Option<T> option, Option<Func<T, Option<U>>> optionFn)
-        => option.IsSome && optionFn.IsSome ? optionFn.Reduce(option.Reduce) : Option.None<U>();
+        => option.IsSome && optionFn.IsSome ? optionFn.Value(option.Value) : Option.None<U>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<U> Apply<T, U>(this Option<T> option, Option<Func<Option<T>, Option<U>>> optionFn)
-        => option.IsSome && optionFn.IsSome ? optionFn.Reduce(option) : Option.None<U>();
+        => option.IsSome && optionFn.IsSome ? optionFn.Value(option) : Option.None<U>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<V> Combine<T, U, V>(this Option<T> option, Option<U> option2, Func<T, U, V> combineFn)
-        => option.IsSome && option2.IsSome ? Option.From(combineFn(option.Reduce, option2.Reduce)) : Option.None<V>();
+        => option.IsSome && option2.IsSome ? Option.From(combineFn(option.Value, option2.Value)) : Option.None<V>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<V> Combine<T, U, V>(this Option<T> option, Option<U> option2, Func<Option<T>, Option<U>, Option<V>> combineFn)

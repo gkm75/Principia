@@ -13,44 +13,44 @@ public static class ResultExtensions
     public static void Deconstruct<TOk, TFail>(this IResult<TOk, TFail> result, out bool hasValue, out TOk ok, out TFail fail)
     {
         hasValue = result.HasValue;
-        ok = result.ReduceOr(default(TOk));
-        fail = result.ReduceFailOr(default(TFail));
+        ok = result.ValueOr(default(TOk));
+        fail = result.FailValueOr(default(TFail));
     }
     
     public static void Deconstruct<TOk, TFail>(this Result<TOk, TFail> result, out bool hasValue, out TOk ok, out TFail fail)
     {
         hasValue = result.HasValue;
-        ok = result.ReduceOr(default(TOk));
-        fail = result.ReduceFailOr(default(TFail));
+        ok = result.ValueOr(default(TOk));
+        fail = result.FailValueOr(default(TFail));
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<TOk> ToEnumerable<TOk, TFail>(this Result<TOk, TFail> result)
-        => result.IsOk ? new []{ result.Reduce } : Enumerable.Empty<TOk>();
+        => result.IsOk ? new []{ result.Value } : Enumerable.Empty<TOk>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TNewOk, TFail> Map<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<TOk, TNewOk> mapFn)
         => result.IsOk 
-            ? Result.From<TNewOk, TFail>(mapFn(result.Reduce), result.ReduceFail) 
-            : Result.Fail<TNewOk, TFail>(result.ReduceFail);
+            ? Result.From<TNewOk, TFail>(mapFn(result.Value), result.ValueFail) 
+            : Result.Fail<TNewOk, TFail>(result.ValueFail);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TNewOk, TFail> Map<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<Result<TOk, TFail>, TNewOk> mapFn)
         => result.IsOk 
-            ? Result.From<TNewOk, TFail>(mapFn(result), result.ReduceFail) 
-            : Result.Fail<TNewOk, TFail>(result.ReduceFail);
+            ? Result.From<TNewOk, TFail>(mapFn(result), result.ValueFail) 
+            : Result.Fail<TNewOk, TFail>(result.ValueFail);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, TFail> MapFail<TOk, TFail>(this Result<TOk, TFail> result, Func<TOk> mapFn)
-        => result.IsFail ? Result.From(mapFn(), result.ReduceFail) : result;
+        => result.IsFail ? Result.From(mapFn(), result.ValueFail) : result;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TNewOk, TFail> Bind<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<TOk, Result<TNewOk, TFail>> bindFn)
-        => result.IsOk ? bindFn(result.Reduce) : Result.Fail<TNewOk, TFail>(result.ReduceFail);
+        => result.IsOk ? bindFn(result.Value) : Result.Fail<TNewOk, TFail>(result.ValueFail);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TNewOk, TFail> Bind<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<Result<TOk, TFail>, Result<TNewOk, TFail>> bindFn)
-        => result.IsOk ? bindFn(result) : Result.Fail<TNewOk, TFail>(result.ReduceFail);
+        => result.IsOk ? bindFn(result) : Result.Fail<TNewOk, TFail>(result.ValueFail);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, TFail> BindFail<TOk, TFail>(this Result<TOk, TFail> result, Func<Result<TOk, TFail>> bindFn)
@@ -58,22 +58,44 @@ public static class ResultExtensions
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, TFail> Join<TOk, TFail>(this Result<Result<TOk, TFail>, TFail> result)
-        => result.IsOk ? result.Reduce : Result.Fail<TOk, TFail>(result.ReduceFail);
+        => result.IsOk ? result.Value : Result.Fail<TOk, TFail>(result.ValueFail);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, TFail> Filter<TOk, TFail>(this Result<TOk, TFail> result, Func<TOk, bool> predicate)
-        => result.IsOk && predicate(result.Reduce) 
+        => result.IsOk && predicate(result.Value) 
             ? result 
             : result.IsFail 
                 ? result 
                 : Result.Fail<TOk,TFail>(default);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Result<TOk, TFail> WhenOk<TOk, TFail>(this Result<TOk, TFail> result, Action action)
+    {
+        if (result.IsOk)
+        {
+            action();
+        }
+
+        return result;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Result<TOk, TFail> WhenFail<TOk, TFail>(this Result<TOk, TFail> result, Action action)
+    {
+        if (result.IsFail)
+        {
+            action();
+        }
+
+        return result;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TOk, TFail> WhenOk<TOk, TFail>(this Result<TOk, TFail> result, Action<TOk> action)
     {
         if (result.IsOk)
         {
-            action(result.Reduce);
+            action(result.Value);
         }
 
         return result;
@@ -84,7 +106,7 @@ public static class ResultExtensions
     {
         if (result.IsFail)
         {
-            action(result.ReduceFail);
+            action(result.ValueFail);
         }
 
         return result;
@@ -121,86 +143,40 @@ public static class ResultExtensions
         => result.IsFail ? fallbackFn() : result;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Match<TOk, TFail>(this Result<TOk, TFail> result, Action<TOk> okAction, Action<TFail> failAction)
-    {
-        if (result.IsOk)
-        {
-            okAction(result.Reduce);
-        }
-        else
-        {
-            failAction(result.ReduceFail);
-        }
-    }
+    public static Result<TOk, TFail> Or<TOk, TFail>(this Result<TOk, TFail> result, Func<TOk> okFn)
+        => result.IsFail ? Result.Ok<TOk, TFail>(okFn()) : result;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Match<TOk, TFail>(this Result<TOk, TFail> result, Action<Result<TOk, TFail>> okAction, Action<Result<TOk, TFail>> failAction)
-    {
-        if (result.IsOk)
-        {
-            okAction(result);
-        }
-        else
-        {
-            failAction(result);
-        }
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TNewOk Match<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, TNewOk ok, TNewOk fail)
-        => result.IsOk ? ok : fail;
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TNewOk Match<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<TNewOk> okFn, Func<TNewOk> failFn)
-        => result.IsOk ? okFn() : failFn();
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Result<TNewOk, TFail> Match<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<Result<TNewOk, TFail>> okFn, Func<Result<TNewOk, TFail>> failFn)
-        => result.IsOk ? okFn() : failFn();
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Result<TNewOk, TFail> Match<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<Result<TNewOk, TFail>> okFn, TNewOk fail)
-        => result.IsOk ? okFn() : Result.Ok<TNewOk, TFail>(fail);
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Result<TNewOk, TFail> Match<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, TNewOk ok, Func<Result<TNewOk, TFail>> failFn)
-        => result.IsOk ? Result.Ok<TNewOk, TFail>(ok) : failFn();
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Result<TNewOk, TFail> Match<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<TNewOk> okFn, TNewOk fail)
-        => result.IsOk ? Result.Ok<TNewOk, TFail>(okFn()) : Result.Ok<TNewOk, TFail>(fail);
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Result<TNewOk, TFail> Match<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, TNewOk ok, Func<TNewOk> failFn)
-        => result.IsOk ? Result.Ok<TNewOk, TFail>(ok) : Result.Ok<TNewOk, TFail>(failFn());
+    public static Result<TOk, TFail> Or<TOk, TFail>(this Result<TOk, TFail> result, Func<TOk> okFn, Func<TFail> failFn)
+        => result.IsFail ? Result.From<TOk, TFail>(okFn(), failFn) : result;
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TNewOk, TFail> Apply<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Result<Func<TOk, TNewOk>, TFail> resultFn)
         => result.IsOk && resultFn.IsOk 
-            ? Result.Ok<TNewOk, TFail>(resultFn.Reduce(result.Reduce)) 
-            : Result.Fail<TNewOk, TFail>(result.ReduceFailOr(resultFn.ReduceFail));
+            ? Result.Ok<TNewOk, TFail>(resultFn.Value(result.Value)) 
+            : Result.Fail<TNewOk, TFail>(result.FailValueOr(resultFn.ValueFail));
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TNewOk, TFail> Apply<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Result<Func<TOk, Result<TNewOk, TFail>>, TFail> resultFn)
         => result.IsOk && resultFn.IsOk 
-            ? resultFn.Reduce(result.Reduce) 
-            : Result.Fail<TNewOk, TFail>(result.ReduceFailOr(resultFn.ReduceFail));
+            ? resultFn.Value(result.Value) 
+            : Result.Fail<TNewOk, TFail>(result.FailValueOr(resultFn.ValueFail));
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TNewOk, TFail> Apply<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Result<Func<Result<TOk, TFail>, Result<TNewOk, TFail>>, TFail> resultFn)
         => result.IsOk && resultFn.IsOk 
-            ? resultFn.Reduce(result) 
-            : Result.Fail<TNewOk, TFail>(result.ReduceFailOr(resultFn.ReduceFail));
+            ? resultFn.Value(result) 
+            : Result.Fail<TNewOk, TFail>(result.FailValueOr(resultFn.ValueFail));
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TNewOk, TFail> Combine<TOkLt, TOkRt, TNewOk, TFail>(this Result<TOkLt, TFail> resultLt, Result<TOkRt, TFail> resultRt, Func<TOkLt, TOkRt, TNewOk> combineFn)
         => resultLt.IsOk && resultRt.IsOk 
-            ? Result.Ok<TNewOk, TFail>(combineFn(resultLt.Reduce, resultRt.Reduce))
-            : Result.Fail<TNewOk, TFail>(resultLt.ReduceFailOr(resultRt.ReduceFail));
+            ? Result.Ok<TNewOk, TFail>(combineFn(resultLt.Value, resultRt.Value))
+            : Result.Fail<TNewOk, TFail>(resultLt.FailValueOr(resultRt.ValueFail));
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Result<TNewOk, TFail> Combine<TOkLt, TOkRt, TNewOk, TFail>(this Result<TOkLt, TFail> resultLt, Result<TOkRt, TFail> resultRt, Func<Result<TOkLt, TFail>, Result<TOkRt, TFail>, Result<TNewOk, TFail>> combineFn)
         => resultLt.IsOk && resultRt.IsOk 
             ? combineFn(resultLt, resultRt)
-            : Result.Fail<TNewOk, TFail>(resultLt.ReduceFailOr(resultRt.ReduceFail));
+            : Result.Fail<TNewOk, TFail>(resultLt.FailValueOr(resultRt.ValueFail));
 }
