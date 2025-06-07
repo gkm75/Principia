@@ -40,15 +40,6 @@ public static class ResultAsyncExtensions
             : Result.Fail<TNewOk, TFail>(result.ValueFail);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TNewOk, TFail>> MapAsync<TOk, TNewOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>, TNewOk> mapFn)
-    {
-        var result = await resultTask;
-        return result.IsOk
-            ? Result.From<TNewOk, TFail>(mapFn(result), result.ValueFail)
-            : Result.Fail<TNewOk, TFail>(result.ValueFail);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Result<TNewOk, TFail>> MapAsync<TOk, TNewOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>, Task<TNewOk>> mapFnAsync)
     {
         var result = await resultTask;
@@ -57,12 +48,6 @@ public static class ResultAsyncExtensions
             : Result.Fail<TNewOk, TFail>(result.ValueFail);
     }
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TNewOk, TFail>> MapAsync<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<Result<TOk, TFail>, Task<TNewOk>> mapFnAsync) 
-        => result.IsOk
-            ? Result.From<TNewOk, TFail>(await mapFnAsync(result), result.ValueFail)
-            : Result.Fail<TNewOk, TFail>(result.ValueFail);
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Result<TOk, TFail>> MapFailAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<TOk> mapFn)
     {
@@ -98,25 +83,7 @@ public static class ResultAsyncExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Result<TNewOk, TFail>> BindAsync<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<TOk, Task<Result<TNewOk, TFail>>> bindFnAsync) 
         => result.IsOk ? await bindFnAsync(result.Value) : Result.Fail<TNewOk, TFail>(result.ValueFail);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TNewOk, TFail>> BindAsync<TOk, TNewOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>, Result<TNewOk, TFail>> bindFn)
-    {
-        var result = await resultTask;
-        return result.IsOk ? bindFn(result) : Result.Fail<TNewOk, TFail>(result.ValueFail);
-    }
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TNewOk, TFail>> BindAsync<TOk, TNewOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>, Task<Result<TNewOk, TFail>>> bindFnAsync)
-    {
-        var result = await resultTask;
-        return result.IsOk ? await bindFnAsync(result) : Result.Fail<TNewOk, TFail>(result.ValueFail);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TNewOk, TFail>> BindAsync<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<Result<TOk, TFail>, Task<Result<TNewOk, TFail>>> bindFnAsync) 
-        => result.IsOk ? await bindFnAsync(result) : Result.Fail<TNewOk, TFail>(result.ValueFail);
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Result<TOk, TFail>> BindFailAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>> bindFn)
     {
@@ -197,30 +164,6 @@ public static class ResultAsyncExtensions
         if (result.IsFail)
         {
             action(result.ValueFail);
-        }
-
-        return result;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TOk, TFail>> WhenOkAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Action<Result<TOk, TFail>> action)
-    {
-        var result = await resultTask;
-        if (result.IsOk)
-        {
-            action(result);
-        }
-
-        return result;
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TOk, TFail>> WhenFailAsync<TOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Action<Result<TOk, TFail>> action)
-    {
-        var result = await resultTask;
-        if (result.IsFail)
-        {
-            action(result);
         }
 
         return result;
@@ -311,30 +254,6 @@ public static class ResultAsyncExtensions
             : Result.Fail<TNewOk, TFail>(result.FailValueOr(resultFnAsync.ValueFail));
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TNewOk, TFail>> ApplyAsync<TOk, TNewOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Result<Func<Result<TOk, TFail>, Result<TNewOk, TFail>>, TFail> resultFn)
-    {
-        var result = await resultTask;
-        return result.IsOk && resultFn.IsOk
-            ? resultFn.Value(result)
-            : Result.Fail<TNewOk, TFail>(result.FailValueOr(resultFn.ValueFail));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TNewOk, TFail>> ApplyAsync<TOk, TNewOk, TFail>(this Task<Result<TOk, TFail>> resultTask, Result<Func<Result<TOk, TFail>, Task<Result<TNewOk, TFail>>>, TFail> resultFnAsync)
-    {
-        var result = await resultTask;
-        return result.IsOk && resultFnAsync.IsOk
-            ? await resultFnAsync.Value(result)
-            : Result.Fail<TNewOk, TFail>(result.FailValueOr(resultFnAsync.ValueFail));
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TNewOk, TFail>> ApplyAsync<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Result<Func<Result<TOk, TFail>, Task<Result<TNewOk, TFail>>>, TFail> resultFnAsync)
-        => result.IsOk && resultFnAsync.IsOk
-            ? await resultFnAsync.Value(result)
-            : Result.Fail<TNewOk, TFail>(result.FailValueOr(resultFnAsync.ValueFail));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Result<TNewOk, TFail>> CombineAsync<TOkLt, TOkRt, TNewOk, TFail>(this Task<Result<TOkLt, TFail>> resultLtTask, Task<Result<TOkRt, TFail>> resultRtTask, Func<TOkLt, TOkRt, TNewOk> combineFn)
     {
         var resultLt = await resultLtTask;
@@ -358,32 +277,6 @@ public static class ResultAsyncExtensions
     public static async Task<Result<TNewOk, TFail>> CombineAsync<TOkLt, TOkRt, TNewOk, TFail>(this Result<TOkLt, TFail> resultLt, Result<TOkRt, TFail> resultRt, Func<TOkLt, TOkRt, Task<TNewOk>> combineFnAsync)
         => resultLt.IsOk && resultRt.IsOk
             ? Result.Ok<TNewOk, TFail>(await combineFnAsync(resultLt.Value, resultRt.Value))
-            : Result.Fail<TNewOk, TFail>(resultLt.FailValueOr(resultRt.ValueFail));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TNewOk, TFail>> CombineAsync<TOkLt, TOkRt, TNewOk, TFail>(this Task<Result<TOkLt, TFail>> resultLtTask, Task<Result<TOkRt, TFail>> resultRtTask, Func<Result<TOkLt, TFail>, Result<TOkRt, TFail>, Result<TNewOk, TFail>> combineFn)
-    {
-        var resultLt = await resultLtTask;
-        var resultRt = await resultRtTask;
-        return resultLt.IsOk && resultRt.IsOk
-            ? combineFn(resultLt, resultRt)
-            : Result.Fail<TNewOk, TFail>(resultLt.FailValueOr(resultRt.ValueFail));
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TNewOk, TFail>> CombineAsync<TOkLt, TOkRt, TNewOk, TFail>(this Task<Result<TOkLt, TFail>> resultLtTask, Task<Result<TOkRt, TFail>> resultRtTask, Func<Result<TOkLt, TFail>, Result<TOkRt, TFail>, Task<Result<TNewOk, TFail>>> combineFnAsync)
-    {
-        var resultLt = await resultLtTask;
-        var resultRt = await resultRtTask;
-        return resultLt.IsOk && resultRt.IsOk
-            ? await combineFnAsync(resultLt, resultRt)
-            : Result.Fail<TNewOk, TFail>(resultLt.FailValueOr(resultRt.ValueFail));
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Result<TNewOk, TFail>> CombineAsync<TOkLt, TOkRt, TNewOk, TFail>(this Result<TOkLt, TFail> resultLt, Result<TOkRt, TFail> resultRt, Func<Result<TOkLt, TFail>, Result<TOkRt, TFail>, Task<Result<TNewOk, TFail>>> combineFnAsync)
-        => resultLt.IsOk && resultRt.IsOk
-            ? await combineFnAsync(resultLt, resultRt)
             : Result.Fail<TNewOk, TFail>(resultLt.FailValueOr(resultRt.ValueFail));
 }
 
@@ -421,30 +314,6 @@ public static class ResultValueAsyncExtensions
             : Result.Fail<TNewOk, TFail>(result.ValueFail);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TNewOk, TFail>> MapValueAsync<TOk, TNewOk, TFail>(this ValueTask<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>, TNewOk> mapFn)
-    {
-        var result = await resultTask;
-        return result.IsOk
-            ? Result.From<TNewOk, TFail>(mapFn(result), result.ValueFail)
-            : Result.Fail<TNewOk, TFail>(result.ValueFail);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TNewOk, TFail>> MapValueAsync<TOk, TNewOk, TFail>(this ValueTask<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>, ValueTask<TNewOk>> mapFnAsync)
-    {
-        var result = await resultTask;
-        return result.IsOk
-            ? Result.From<TNewOk, TFail>(await mapFnAsync(result), result.ValueFail)
-            : Result.Fail<TNewOk, TFail>(result.ValueFail);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TNewOk, TFail>> MapValueAsync<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<Result<TOk, TFail>, ValueTask<TNewOk>> mapFnAsync) 
-        => result.IsOk
-            ? Result.From<TNewOk, TFail>(await mapFnAsync(result), result.ValueFail)
-            : Result.Fail<TNewOk, TFail>(result.ValueFail);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Result<TOk, TFail>> MapFailValueAsync<TOk, TFail>(this ValueTask<Result<TOk, TFail>> resultTask, Func<TOk> mapFn)
     {
         var result = await resultTask;
@@ -479,25 +348,7 @@ public static class ResultValueAsyncExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Result<TNewOk, TFail>> BindValueAsync<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<TOk, ValueTask<Result<TNewOk, TFail>>> bindFnAsync) 
         => result.IsOk ? await bindFnAsync(result.Value) : Result.Fail<TNewOk, TFail>(result.ValueFail);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TNewOk, TFail>> BindValueAsync<TOk, TNewOk, TFail>(this ValueTask<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>, Result<TNewOk, TFail>> bindFn)
-    {
-        var result = await resultTask;
-        return result.IsOk ? bindFn(result) : Result.Fail<TNewOk, TFail>(result.ValueFail);
-    }
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TNewOk, TFail>> BindValueAsync<TOk, TNewOk, TFail>(this ValueTask<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>, ValueTask<Result<TNewOk, TFail>>> bindFnAsync)
-    {
-        var result = await resultTask;
-        return result.IsOk ? await bindFnAsync(result) : Result.Fail<TNewOk, TFail>(result.ValueFail);
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TNewOk, TFail>> BindValueAsync<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Func<Result<TOk, TFail>, ValueTask<Result<TNewOk, TFail>>> bindFnAsync) 
-        => result.IsOk ? await bindFnAsync(result) : Result.Fail<TNewOk, TFail>(result.ValueFail);
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Result<TOk, TFail>> BindFailValueAsync<TOk, TFail>(this ValueTask<Result<TOk, TFail>> resultTask, Func<Result<TOk, TFail>> bindFn)
     {
@@ -578,30 +429,6 @@ public static class ResultValueAsyncExtensions
         if (result.IsFail)
         {
             action(result.ValueFail);
-        }
-
-        return result;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TOk, TFail>> WhenOkValueAsync<TOk, TFail>(this ValueTask<Result<TOk, TFail>> resultTask, Action<Result<TOk, TFail>> action)
-    {
-        var result = await resultTask;
-        if (result.IsOk)
-        {
-            action(result);
-        }
-
-        return result;
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TOk, TFail>> WhenFailValueAsync<TOk, TFail>(this ValueTask<Result<TOk, TFail>> resultTask, Action<Result<TOk, TFail>> action)
-    {
-        var result = await resultTask;
-        if (result.IsFail)
-        {
-            action(result);
         }
 
         return result;
@@ -692,24 +519,6 @@ public static class ResultValueAsyncExtensions
             : Result.Fail<TNewOk, TFail>(result.FailValueOr(resultFnAsync.ValueFail));
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TNewOk, TFail>> ApplyValueAsync<TOk, TNewOk, TFail>(this ValueTask<Result<TOk, TFail>> resultTask, Result<Func<Result<TOk, TFail>, Result<TNewOk, TFail>>, TFail> resultFn)
-    {
-        var result = await resultTask;
-        return result.IsOk && resultFn.IsOk
-            ? resultFn.Value(result)
-            : Result.Fail<TNewOk, TFail>(result.FailValueOr(resultFn.ValueFail));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TNewOk, TFail>> ApplyValueAsync<TOk, TNewOk, TFail>(this ValueTask<Result<TOk, TFail>> resultTask, Result<Func<Result<TOk, TFail>, ValueTask<Result<TNewOk, TFail>>>, TFail> resultFnAsync)
-    {
-        var result = await resultTask;
-        return result.IsOk && resultFnAsync.IsOk
-            ? await resultFnAsync.Value(result)
-            : Result.Fail<TNewOk, TFail>(result.FailValueOr(resultFnAsync.ValueFail));
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Result<TNewOk, TFail>> ApplyValueAsync<TOk, TNewOk, TFail>(this Result<TOk, TFail> result, Result<Func<Result<TOk, TFail>, ValueTask<Result<TNewOk, TFail>>>, TFail> resultFnAsync)
         => result.IsOk && resultFnAsync.IsOk
             ? await resultFnAsync.Value(result)
@@ -741,29 +550,4 @@ public static class ResultValueAsyncExtensions
             ? Result.Ok<TNewOk, TFail>(await combineFnAsync(resultLt.Value, resultRt.Value))
             : Result.Fail<TNewOk, TFail>(resultLt.FailValueOr(resultRt.ValueFail));
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TNewOk, TFail>> CombineValueAsync<TOkLt, TOkRt, TNewOk, TFail>(this ValueTask<Result<TOkLt, TFail>> resultLtTask, ValueTask<Result<TOkRt, TFail>> resultRtTask, Func<Result<TOkLt, TFail>, Result<TOkRt, TFail>, Result<TNewOk, TFail>> combineFn)
-    {
-        var resultLt = await resultLtTask;
-        var resultRt = await resultRtTask;
-        return resultLt.IsOk && resultRt.IsOk
-            ? combineFn(resultLt, resultRt)
-            : Result.Fail<TNewOk, TFail>(resultLt.FailValueOr(resultRt.ValueFail));
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TNewOk, TFail>> CombineValueAsync<TOkLt, TOkRt, TNewOk, TFail>(this ValueTask<Result<TOkLt, TFail>> resultLtTask, ValueTask<Result<TOkRt, TFail>> resultRtTask, Func<Result<TOkLt, TFail>, Result<TOkRt, TFail>, ValueTask<Result<TNewOk, TFail>>> combineFnAsync)
-    {
-        var resultLt = await resultLtTask;
-        var resultRt = await resultRtTask;
-        return resultLt.IsOk && resultRt.IsOk
-            ? await combineFnAsync(resultLt, resultRt)
-            : Result.Fail<TNewOk, TFail>(resultLt.FailValueOr(resultRt.ValueFail));
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Result<TNewOk, TFail>> CombineValueAsync<TOkLt, TOkRt, TNewOk, TFail>(this Result<TOkLt, TFail> resultLt, Result<TOkRt, TFail> resultRt, Func<Result<TOkLt, TFail>, Result<TOkRt, TFail>, ValueTask<Result<TNewOk, TFail>>> combineFnAsync)
-        => resultLt.IsOk && resultRt.IsOk
-            ? await combineFnAsync(resultLt, resultRt)
-            : Result.Fail<TNewOk, TFail>(resultLt.FailValueOr(resultRt.ValueFail));
-}
+ }

@@ -62,7 +62,7 @@ namespace Principia.Trials
             var d =c.Map( h => h + 1) .MapNone( () => 2);
             
             var x = c.Map(async (int dd) => await Task.FromResult(dd)).Map( async j => (await j) + 1);
-
+            c.WhenSome(s => { });
             var opt = Option.Some(9);
             var opt2 = opt.Bind(x => Option.Some(x.ToString()));
 

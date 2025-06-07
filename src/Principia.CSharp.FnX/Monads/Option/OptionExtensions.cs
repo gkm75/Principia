@@ -27,11 +27,7 @@ public static class OptionExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<U> Map<T, U>(this Option<T> option, Func<T, U> mapFn)
         => option.IsSome ? Option.From(mapFn(option.Value)) : Option.None<U>();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Option<U> Map<T, U>(this Option<T> option, Func<Option<T>, U> mapFn)
-        => option.IsSome ? Option.From(mapFn(option)) : Option.None<U>();
-
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<T> MapNone<T>(this Option<T> option, Func<T> mapFn)
         => option.IsNone ? Option.From(mapFn()) : option;
@@ -59,10 +55,6 @@ public static class OptionExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<T> Filter<T>(this Option<T> option, Func<T, bool> predicate)
         => option.IsSome && predicate(option.Value) ? option : Option.None<T>();
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Option<T> Filter<T>(this Option<T> option, Func<Option<T>, bool> predicate)
-        => option.IsSome && predicate(option) ? option : Option.None<T>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<T> WhenSome<T>(this Option<T> option, Action action)
@@ -98,28 +90,6 @@ public static class OptionExtensions
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Option<T> WhenSome<T>(this Option<T> option, Action<Option<T>> action)
-    {
-        if (option.IsSome)
-        {
-            action(option);
-        }
-
-        return option;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Option<T> WhenNone<T>(this Option<T> option, Action<Option<T>> action)
-    {
-        if (option.IsNone)
-        {
-            action(option);
-        }
-
-        return option;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<T> Or<T>(this Option<T> option, T fallback)
         => option.IsNone ? Option.From(fallback) : option;
 
@@ -144,14 +114,6 @@ public static class OptionExtensions
         => option.IsSome && optionFn.IsSome ? optionFn.Value(option.Value) : Option.None<U>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Option<U> Apply<T, U>(this Option<T> option, Option<Func<Option<T>, Option<U>>> optionFn)
-        => option.IsSome && optionFn.IsSome ? optionFn.Value(option) : Option.None<U>();
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Option<V> Combine<T, U, V>(this Option<T> option, Option<U> option2, Func<T, U, V> combineFn)
         => option.IsSome && option2.IsSome ? Option.From(combineFn(option.Value, option2.Value)) : Option.None<V>();
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Option<V> Combine<T, U, V>(this Option<T> option, Option<U> option2, Func<Option<T>, Option<U>, Option<V>> combineFn)
-        => option.IsSome && option2.IsSome ? combineFn(option, option2) : Option.None<V>();
 }

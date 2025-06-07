@@ -32,25 +32,6 @@ public static class OptionAsyncExtensions
         var option = await optionTask;
         return option.IsSome ? Option.From(mapFn(option.Value)) : Option.None<U>();
     }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<U>> MapAsync<T, U>(this Task<Option<T>> optionTask, Func<Option<T>, Task<U>> mapFnAsync)
-    {
-        var option = await optionTask;
-        return option.IsSome ? Option.From(await mapFnAsync(option)) : Option.None<U>();
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<U>> MapAsync<T, U>(this Option<T> option, Func<Option<T>, Task<U>> mapFnAsync)
-        => option.IsSome ? Option.From(await mapFnAsync(option)) : Option.None<U>();
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<U>> MapAsync<T, U>(this Task<Option<T>> optionTask, Func<Option<T>, U> mapFn)
-    {
-        var option = await optionTask;
-        return option.IsSome ? Option.From(mapFn(option)) : Option.None<U>();
-    }
-    
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Option<T>> MapNone<T, U>(this Task<Option<T>> optionTask, Func<T> mapFn)
@@ -80,25 +61,7 @@ public static class OptionAsyncExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Option<U>> BindAsync<T, U>(this Option<T> option, Func<T, Task<Option<U>>> bindFnAsync) 
         => option.IsSome ? await bindFnAsync(option.Value) : Option.None<U>();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<U>> BindAsync<T, U>(this Task<Option<T>> optionTask, Func<Option<T>, Option<U>> bindFn)
-    {
-        var option = await optionTask;
-        return option.IsSome ? bindFn(option) : Option.None<U>();
-    }
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<U>> BindAsync<T, U>(this Task<Option<T>> optionTask, Func<Option<T>, Task<Option<U>>> bindFnAsync)
-    {
-        var option = await optionTask;
-        return option.IsSome ? await bindFnAsync(option) : Option.None<U>();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<U>> BindAsync<T, U>(this Option<T> option, Func<Option<T>, Task<Option<U>>> bindFnAsync) 
-        => option.IsSome ? await bindFnAsync(option) : Option.None<U>();
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Option<T>> BindNoneAsync<T>(this Task<Option<T>> optionTask, Func<Task<Option<T>>> bindFnAsync)
     {
@@ -145,24 +108,6 @@ public static class OptionAsyncExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Option<T>> Filter<T>(this Option<T> option, Func<T, Task<bool>> predicateAsync) 
         => option.IsSome && await predicateAsync(option.Value) ? option : Option.None<T>();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<T>> Filter<T>(this Task<Option<T>> optionTask, Func<Option<T>, bool> predicate)
-    {
-        var option = await optionTask;
-        return option.IsSome && predicate(option) ? option : Option.None<T>();
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<T>> Filter<T>(this Task<Option<T>> optionTask, Func<Option<T>, Task<bool>> predicateAsync)
-    {
-        var option = await optionTask;
-        return option.IsSome && await predicateAsync(option) ? option : Option.None<T>();
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<T>> Filter<T>(this Option<T> option, Func<Option<T>, Task<bool>> predicateAsync) 
-        => option.IsSome && await predicateAsync(option) ? option : Option.None<T>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Option<T>> WhenSomeAsync<T>(this Task<Option<T>> optionTask, Action<T> action)
@@ -183,30 +128,6 @@ public static class OptionAsyncExtensions
         if (option.IsNone)
         {
             action();
-        }
-
-        return option;
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<T>> WhenSomeAsync<T>(this Task<Option<T>> optionTask, Action<Option<T>> action)
-    {
-        var option = await optionTask;
-        if (option.IsSome)
-        {
-            action(option);
-        }
-
-        return option;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<T>> WhenNoneAsync<T>(this Task<Option<T>> optionTask, Action<Option<T>> action)
-    {
-        var option = await optionTask;
-        if (option.IsNone)
-        {
-            action(option);
         }
 
         return option;
@@ -266,19 +187,6 @@ public static class OptionAsyncExtensions
     public static async Task<Option<T>> OrAsync<T>(this Option<T> option, Func<Task<Option<T>>> fallbackFn) 
         => option.IsNone ? await fallbackFn() : option;
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task MatchAsync<T>(this Task<Option<T>> optionTask, Action<T> someAction, Action noneAction)
-    {
-        var option = await optionTask;
-        if (option.IsSome)
-        {
-            someAction(option.Value);
-        }
-        else
-        {
-            noneAction();
-        }
-    }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Option<U>> ApplyAsync<T, U>(this Task<Option<T>> optionTask, Option<Func<T, U>> optionFn)
@@ -292,13 +200,6 @@ public static class OptionAsyncExtensions
     {
         var option = await optionTask;
         return option.IsSome && optionFn.IsSome ? optionFn.Value(option.Value) : Option.None<U>();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<U>> ApplyAsync<T, U>(this Task<Option<T>> optionTask, Option<Func<Option<T>, Option<U>>> optionFn)
-    {
-        var option = await optionTask;
-        return option.IsSome && optionFn.IsSome ? optionFn.Value(option) : Option.None<U>();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -316,13 +217,6 @@ public static class OptionAsyncExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<U>> ApplyAsync<T, U>(this Task<Option<T>> optionTask, Option<Func<Option<T>, Task<Option<U>>>> optionFnAsync)
-    {
-        var option = await optionTask;
-        return option.IsSome && optionFnAsync.IsSome ? await optionFnAsync.Value(option) : Option.None<U>();
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Option<U>> ApplyAsync<T, U>(this Option<T> option, Option<Func<T, Task<U>>> optionFnAsync) 
         => option.IsSome && optionFnAsync.IsSome ? Option.From(await optionFnAsync.Value(option.Value)) : Option.None<U>();
 
@@ -331,25 +225,12 @@ public static class OptionAsyncExtensions
         => option.IsSome && optionFnAsync.IsSome ? optionFnAsync.Value(option.Value) : Task.FromResult(Option.None<U>());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Task<Option<U>> ApplyAsync<T, U>(this Option<T> option, Option<Func<Option<T>, Task<Option<U>>>> optionFnAsync)
-    {
-        return option.IsSome && optionFnAsync.IsSome ? optionFnAsync.Value(option) : Task.FromResult(Option.None<U>());
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task<Option<V>> CombineAsync<T, U, V>(this Task<Option<T>> optionTask, Task<Option<U>> option2Task, Func<T, U, V> combineFn)
     {
         var (option, option2) = (await optionTask, await option2Task);
         return option.IsSome && option2.IsSome
             ? Option.From(combineFn(option.Value, option2.Value))
             : Option.None<V>();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<V>> CombineAsync<T, U, V>(this Task<Option<T>> optionTask, Task<Option<U>> option2Task, Func<Option<T>, Option<U>, Option<V>> combineFn)
-    {
-        var (option, option2) = (await optionTask, await option2Task);
-        return option.IsSome && option2.IsSome ? combineFn(option, option2) : Option.None<V>();
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -375,13 +256,6 @@ public static class OptionAsyncExtensions
         return option.IsSome && option2.IsSome
             ? Option.From(combineFn(option.Value, option2.Value))
             : Option.None<V>();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async Task<Option<V>> CombineAsync<T, U, V>(this Option<T> option, Task<Option<U>> option2Task, Func<Option<T>, Option<U>, Option<V>> combineFn)
-    {
-        var option2 = await option2Task;
-        return option.IsSome && option2.IsSome ? combineFn(option, option2) : Option.None<V>();
     }
 }
 
@@ -411,25 +285,6 @@ public static class OptionValueAsyncExtensions
         var option = await optionTask;
         return option.IsSome ? Option.From(mapFn(option.Value)) : Option.None<U>();
     }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<U>> MapAsync<T, U>(this ValueTask<Option<T>> optionTask, Func<Option<T>, ValueTask<U>> mapFnAsync)
-    {
-        var option = await optionTask;
-        return option.IsSome ? Option.From(await mapFnAsync(option)) : Option.None<U>();
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<U>> MapAsync<T, U>(this Option<T> option, Func<Option<T>, ValueTask<U>> mapFnAsync)
-        => option.IsSome ? Option.From(await mapFnAsync(option)) : Option.None<U>();
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<U>> MapAsync<T, U>(this ValueTask<Option<T>> optionTask, Func<Option<T>, U> mapFn)
-    {
-        var option = await optionTask;
-        return option.IsSome ? Option.From(mapFn(option)) : Option.None<U>();
-    }
-    
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Option<T>> MapNone<T, U>(this ValueTask<Option<T>> optionTask, Func<T> mapFn)
@@ -459,25 +314,7 @@ public static class OptionValueAsyncExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Option<U>> BindAsync<T, U>(this Option<T> option, Func<T, ValueTask<Option<U>>> bindFnAsync) 
         => option.IsSome ? await bindFnAsync(option.Value) : Option.None<U>();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<U>> BindAsync<T, U>(this ValueTask<Option<T>> optionTask, Func<Option<T>, Option<U>> bindFn)
-    {
-        var option = await optionTask;
-        return option.IsSome ? bindFn(option) : Option.None<U>();
-    }
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<U>> BindAsync<T, U>(this ValueTask<Option<T>> optionTask, Func<Option<T>, ValueTask<Option<U>>> bindFnAsync)
-    {
-        var option = await optionTask;
-        return option.IsSome ? await bindFnAsync(option) : Option.None<U>();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<U>> BindAsync<T, U>(this Option<T> option, Func<Option<T>, ValueTask<Option<U>>> bindFnAsync) 
-        => option.IsSome ? await bindFnAsync(option) : Option.None<U>();
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Option<T>> BindNoneAsync<T>(this ValueTask<Option<T>> optionTask, Func<ValueTask<Option<T>>> bindFnAsync)
     {
@@ -525,23 +362,6 @@ public static class OptionValueAsyncExtensions
     public static async ValueTask<Option<T>> Filter<T>(this Option<T> option, Func<T, ValueTask<bool>> predicateAsync) 
         => option.IsSome && await predicateAsync(option.Value) ? option : Option.None<T>();
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<T>> Filter<T>(this ValueTask<Option<T>> optionTask, Func<Option<T>, bool> predicate)
-    {
-        var option = await optionTask;
-        return option.IsSome && predicate(option) ? option : Option.None<T>();
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<T>> Filter<T>(this ValueTask<Option<T>> optionTask, Func<Option<T>, ValueTask<bool>> predicateAsync)
-    {
-        var option = await optionTask;
-        return option.IsSome && await predicateAsync(option) ? option : Option.None<T>();
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<T>> Filter<T>(this Option<T> option, Func<Option<T>, ValueTask<bool>> predicateAsync) 
-        => option.IsSome && await predicateAsync(option) ? option : Option.None<T>();
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Option<T>> WhenSomeAsync<T>(this ValueTask<Option<T>> optionTask, Action<T> action)
@@ -567,18 +387,6 @@ public static class OptionValueAsyncExtensions
         return option;
     }
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<T>> WhenSomeAsync<T>(this ValueTask<Option<T>> optionTask, Action<Option<T>> action)
-    {
-        var option = await optionTask;
-        if (option.IsSome)
-        {
-            action(option);
-        }
-
-        return option;
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Option<T>> WhenNoneAsync<T>(this ValueTask<Option<T>> optionTask, Action<Option<T>> action)
     {
@@ -645,19 +453,6 @@ public static class OptionValueAsyncExtensions
     public static async ValueTask<Option<T>> OrAsync<T>(this Option<T> option, Func<ValueTask<Option<T>>> fallbackFn) 
         => option.IsNone ? await fallbackFn() : option;
     
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask MatchAsync<T>(this ValueTask<Option<T>> optionTask, Action<T> someAction, Action noneAction)
-    {
-        var option = await optionTask;
-        if (option.IsSome)
-        {
-            someAction(option.Value);
-        }
-        else
-        {
-            noneAction();
-        }
-    }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Option<U>> ApplyAsync<T, U>(this ValueTask<Option<T>> optionTask, Option<Func<T, U>> optionFn)
@@ -672,14 +467,7 @@ public static class OptionValueAsyncExtensions
         var option = await optionTask;
         return option.IsSome && optionFn.IsSome ? optionFn.Value(option.Value) : Option.None<U>();
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<U>> ApplyAsync<T, U>(this ValueTask<Option<T>> optionTask, Option<Func<Option<T>, Option<U>>> optionFn)
-    {
-        var option = await optionTask;
-        return option.IsSome && optionFn.IsSome ? optionFn.Value(option) : Option.None<U>();
-    }
-
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Option<U>> ApplyAsync<T, U>(this ValueTask<Option<T>> optionTask, Option<Func<T, ValueTask<U>>> optionFnAsync)
     {
@@ -693,13 +481,6 @@ public static class OptionValueAsyncExtensions
         var option = await optionTask;
         return option.IsSome && optionFnAsync.IsSome ? await optionFnAsync.Value(option.Value) : Option.None<U>();
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<U>> ApplyAsync<T, U>(this ValueTask<Option<T>> optionTask, Option<Func<Option<T>, ValueTask<Option<U>>>> optionFnAsync)
-    {
-        var option = await optionTask;
-        return option.IsSome && optionFnAsync.IsSome ? await optionFnAsync.Value(option) : Option.None<U>();
-    }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Option<U>> ApplyAsync<T, U>(this Option<T> option, Option<Func<T, ValueTask<U>>> optionFnAsync) 
@@ -708,13 +489,7 @@ public static class OptionValueAsyncExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValueTask<Option<U>> ApplyAsync<T, U>(this Option<T> option, Option<Func<T, ValueTask<Option<U>>>> optionFnAsync) 
         => option.IsSome && optionFnAsync.IsSome ? optionFnAsync.Value(option.Value) : ValueTask.FromResult(Option.None<U>());
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValueTask<Option<U>> ApplyAsync<T, U>(this Option<T> option, Option<Func<Option<T>, ValueTask<Option<U>>>> optionFnAsync)
-    {
-        return option.IsSome && optionFnAsync.IsSome ? optionFnAsync.Value(option) : ValueTask.FromResult(Option.None<U>());
-    }
-
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Option<V>> CombineAsync<T, U, V>(this ValueTask<Option<T>> optionTask, ValueTask<Option<U>> option2Task, Func<T, U, V> combineFn)
     {
@@ -722,13 +497,6 @@ public static class OptionValueAsyncExtensions
         return option.IsSome && option2.IsSome
             ? Option.From(combineFn(option.Value, option2.Value))
             : Option.None<V>();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<V>> CombineAsync<T, U, V>(this ValueTask<Option<T>> optionTask, ValueTask<Option<U>> option2Task, Func<Option<T>, Option<U>, Option<V>> combineFn)
-    {
-        var (option, option2) = (await optionTask, await option2Task);
-        return option.IsSome && option2.IsSome ? combineFn(option, option2) : Option.None<V>();
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -739,13 +507,6 @@ public static class OptionValueAsyncExtensions
             ? Option.From(combineFn(option.Value, option2.Value))
             : Option.None<V>();
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<V>> CombineAsync<T, U, V>(this ValueTask<Option<T>> optionTask, Option<U> option2, Func<Option<T>, Option<U>, Option<V>> combineFn)
-    {
-        var option = await optionTask;
-        return option.IsSome && option2.IsSome ? combineFn(option, option2) : Option.None<V>();
-    }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async ValueTask<Option<V>> CombineAsync<T, U, V>(this Option<T> option, ValueTask<Option<U>> option2Task, Func<T, U, V> combineFn)
@@ -754,12 +515,5 @@ public static class OptionValueAsyncExtensions
         return option.IsSome && option2.IsSome
             ? Option.From(combineFn(option.Value, option2.Value))
             : Option.None<V>();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask<Option<V>> CombineAsync<T, U, V>(this Option<T> option, ValueTask<Option<U>> option2Task, Func<Option<T>, Option<U>, Option<V>> combineFn)
-    {
-        var option2 = await option2Task;
-        return option.IsSome && option2.IsSome ? combineFn(option, option2) : Option.None<V>();
     }
 }
