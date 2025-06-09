@@ -11,6 +11,19 @@ namespace Principia.CSharp.FnX.Monads;
 public static class IdentityExtensions
 {
     /// <summary>
+    /// Deconstructs the passed identity into a hasValue and value components 
+    /// </summary>
+    /// <param name="identity"></param>
+    /// <param name="hasValue"></param>
+    /// <param name="value"></param>
+    /// <typeparam name="T"></typeparam>
+    public static void Deconstruct<T>(this Identity<T> identity, out bool hasValue, out T value)
+    {
+        hasValue = identity.HasValue;
+        value = identity.ValueOr(default(T));
+    }
+    
+    /// <summary>
     /// Returns an enumerable out of the Identity, if there is no value then the empty enumerable is returned
     /// </summary>
     /// <param name="identity">The identity instance</param>

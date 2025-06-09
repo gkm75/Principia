@@ -1,19 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
-    <PackageReference Include="Moq" Version="4.16.0" />
+    <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="NUnit" Version="3.13.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Principia.CSharp.FnX\Principia.CSharp.FnX.csproj" />
     <ProjectReference Include="..\Principia.Mocking\Principia.Mocking.csproj" />
     <ProjectReference Include="..\Principia.Monads\Principia.Monads.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="FnX\Monads\" />
   </ItemGroup>
 
 </Project>
